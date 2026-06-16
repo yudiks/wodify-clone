@@ -1,20 +1,19 @@
-import { getToken } from "next-auth/jwt";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 
-export async function middleware(req: NextRequest) {
+export default auth((req) => {
   const { pathname } = req.nextUrl;
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  if (!token) {
+  if (!req.auth) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (pathname.startsWith("/coach") && token.role !== "COACH") {
+  if (pathname.startsWith("/coach") && req.auth.user.role !== "COACH") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ["/dashboard/:path*", "/coach/:path*", "/submissions/:path*"],
