@@ -26,6 +26,7 @@ export default function UploadForm() {
       const blob = await upload(file.name, file, {
         access: "public",
         handleUploadUrl: "/api/submissions/upload",
+        addRandomSuffix: true,
       });
 
       setProgress("Saving submission...");
