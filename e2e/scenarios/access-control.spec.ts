@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { ATHLETE, COACH, BLANK_PNG, loginAs } from "../fixtures/auth";
+import { test, expect, ATHLETE, COACH, BLANK_PNG, loginAs } from "../fixtures/auth";
 
 test.describe("Role-based access control", () => {
   test("athlete is redirected away from /coach", async ({ page }) => {

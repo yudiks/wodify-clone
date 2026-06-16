@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { ATHLETE, COACH, loginAs, logout } from "../fixtures/auth";
+import { test, expect, ATHLETE, COACH, loginAs, logout } from "../fixtures/auth";
 
 test.describe("Authentication", () => {
   test("redirects unauthenticated users from protected pages to /login", async ({

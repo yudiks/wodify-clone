@@ -1,4 +1,36 @@
-import { type Page } from "@playwright/test";
+import { test as base, expect, type Page } from "@playwright/test";
+
+export { expect } from "@playwright/test";
+
+// Custom test that intercepts Vercel Blob CDN uploads in CI so tests don't
+// require real network access to vercel.com/api/blob.
+export const test = base.extend<Record<string, never>>({
+  page: async ({ page }, use) => {
+    if (process.env.CI) {
+      await page.route("https://vercel.com/api/blob**", async (route) => {
+        if (route.request().method() === "PUT") {
+          const reqUrl = new URL(route.request().url());
+          const pathname = reqUrl.searchParams.get("pathname") ?? "test-video.mp4";
+          const fakeUrl = `https://public.blob.vercel-storage.com/${pathname}`;
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              url: fakeUrl,
+              downloadUrl: `${fakeUrl}?download=1`,
+              pathname,
+              contentType: "video/mp4",
+              contentDisposition: `inline; filename="${pathname}"`,
+            }),
+          });
+        } else {
+          await route.continue();
+        }
+      });
+    }
+    await use(page);
+  },
+});
 
 export const ATHLETE = {
   email: "athlete@example.com",

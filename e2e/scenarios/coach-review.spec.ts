@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { ATHLETE, COACH, BLANK_PNG, loginAs } from "../fixtures/auth";
+import { test, expect, ATHLETE, COACH, BLANK_PNG, loginAs } from "../fixtures/auth";
 import path from "path";
 
 const sampleVideo = path.resolve(__dirname, "../../public/sample.mp4");

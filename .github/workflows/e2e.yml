@@ -29,7 +29,6 @@ jobs:
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
       NEXTAUTH_URL: http://localhost:3000
       BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-      VERCEL_BLOB_CALLBACK_URL: http://localhost:3000
 
     steps:
       - uses: actions/checkout@v4
