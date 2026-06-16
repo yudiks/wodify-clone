@@ -1,5 +1,6 @@
 "use client";
 
+import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
@@ -8,6 +9,7 @@ export default function UploadForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -15,22 +17,38 @@ export default function UploadForm() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
+    const title = formData.get("title") as string;
+    const movementType = formData.get("movementType") as string;
+    const file = formData.get("video") as File;
 
-    const res = await fetch("/api/submissions", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      setProgress("Uploading video...");
+      const blob = await upload(file.name, file, {
+        access: "public",
+        handleUploadUrl: "/api/submissions/upload",
+      });
 
-    setLoading(false);
+      setProgress("Saving submission...");
+      const res = await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, movementType, videoUrl: blob.url }),
+      });
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Upload failed");
-      return;
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error ?? "Upload failed");
+        return;
+      }
+
+      formRef.current?.reset();
+      router.refresh();
+    } catch (err) {
+      setError((err as Error).message ?? "Upload failed");
+    } finally {
+      setLoading(false);
+      setProgress(null);
     }
-
-    formRef.current?.reset();
-    router.refresh();
   }
 
   return (
@@ -74,7 +92,7 @@ export default function UploadForm() {
         disabled={loading}
         className="self-start rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
       >
-        {loading ? "Uploading..." : "Upload"}
+        {loading ? (progress ?? "Uploading...") : "Upload"}
       </button>
     </form>
   );
