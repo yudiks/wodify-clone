@@ -2,7 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: false, // sequential — tests share the same DB
+  fullyParallel: false,
+  workers: 1, // one worker — tests share the same DB and Vercel Blob token
   retries: 0,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
