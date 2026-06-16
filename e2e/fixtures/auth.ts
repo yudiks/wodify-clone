@@ -4,7 +4,7 @@ export { expect } from "@playwright/test";
 
 // Custom test that intercepts Vercel Blob CDN uploads in CI so tests don't
 // require real network access to vercel.com/api/blob.
-export const test = base.extend<Record<string, never>>({
+export const test = base.extend({
   page: async ({ page }, use) => {
     if (process.env.CI) {
       await page.route("https://vercel.com/api/blob**", async (route) => {
