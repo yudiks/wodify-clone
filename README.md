@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FormCheck — Coaching Feedback App
 
-## Getting Started
+Athletes record a movement on their phone and upload the video. Coaches review
+it, draw annotations directly on a paused frame, leave a note, and reply with
+timestamped comments — all on the same page.
 
-First, run the development server:
+## Stack
+
+- Next.js 15 (App Router) + TypeScript + Tailwind CSS
+- PostgreSQL + Prisma
+- NextAuth (credentials login, roles: `ATHLETE` / `COACH`)
+- Video files stored on local disk (`public/uploads`), behind a small storage
+  abstraction in [`src/lib/storage.ts`](src/lib/storage.ts) so it can be
+  swapped for S3-compatible storage later
+
+## Local development
+
+Requires Node 20+ and a Postgres database.
 
 ```bash
+cp .env.example .env   # edit DATABASE_URL if needed
+npm install
+npx prisma migrate dev
+npm run db:seed         # creates a coach and athlete test account
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Seeded accounts:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Coach: `coach@example.com` / `coachpass123`
+- Athlete: `athlete@example.com` / `athletepass123`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Run with Docker (recommended for deployment)
 
-## Learn More
+This spins up Postgres + the app, runs migrations automatically, and persists
+both the database and uploaded videos in named volumes.
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+docker compose up -d --build
+docker compose exec app npm run db:seed   # optional: create test accounts
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The app is available at http://localhost:3000.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+For production, set real values for `NEXTAUTH_SECRET` (a long random string)
+and `NEXTAUTH_URL` (your public URL) — either in a `.env` file next to
+`docker-compose.yml` or as environment variables on your host/PaaS:
 
-## Deploy on Vercel
+```bash
+NEXTAUTH_SECRET=$(openssl rand -base64 32)
+NEXTAUTH_URL=https://your-domain.example
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This setup works on any VPS or Docker-friendly platform (Railway, Render,
+Fly.io, etc.). Note that platforms without a persistent filesystem (e.g.
+Vercel) won't work with the local-disk storage as-is — swap
+`src/lib/storage.ts` for an S3-compatible client first.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## How it works
+
+- `/register`, `/login` — sign up as an athlete or coach
+- `/dashboard` (athlete) — upload a video with a title and movement type
+- `/coach` — list of pending/reviewed submissions
+- `/submissions/[id]` — video player; coaches can pause, draw on the frame
+  (pen + color picker), attach a note, and save it as a timestamped
+  annotation. Both roles can leave timestamped comments that seek the video
+  when clicked.
+
+## Project structure
+
+- `prisma/schema.prisma` — data model (`User`, `Submission`, `Annotation`, `Comment`)
+- `src/lib/auth.ts` — NextAuth config (credentials provider, JWT sessions, roles)
+- `src/lib/storage.ts` — file storage abstraction
+- `src/middleware.ts` — route protection and role gating
+- `src/app/api/**` — REST API routes for submissions, annotations, comments
+- `src/components/VideoAnnotator.tsx` — video player + canvas drawing overlay
+- `src/components/CommentThread.tsx` — timestamped comment thread

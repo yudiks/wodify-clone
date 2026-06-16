@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ATHLETE
+  COACH
+}
+
+enum SubmissionStatus {
+  PENDING
+  REVIEWED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(ATHLETE)
+  createdAt    DateTime @default(now())
+
+  submissions Submission[] @relation("AthleteSubmissions")
+  annotations Annotation[]
+  comments    Comment[]
+}
+
+model Submission {
+  id           String           @id @default(cuid())
+  athleteId    String
+  athlete      User             @relation("AthleteSubmissions", fields: [athleteId], references: [id])
+  title        String
+  movementType String
+  videoUrl     String
+  status       SubmissionStatus @default(PENDING)
+  createdAt    DateTime         @default(now())
+
+  annotations Annotation[]
+  comments    Comment[]
+}
+
+model Annotation {
+  id            String     @id @default(cuid())
+  submissionId  String
+  submission    Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  coachId       String
+  coach         User       @relation(fields: [coachId], references: [id])
+  timestampSec  Float
+  drawingDataUrl String
+  note          String
+  createdAt     DateTime   @default(now())
+}
+
+model Comment {
+  id           String     @id @default(cuid())
+  submissionId String
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  authorId     String
+  author       User       @relation(fields: [authorId], references: [id])
+  timestampSec Float?
+  text         String
+  createdAt    DateTime   @default(now())
+}
