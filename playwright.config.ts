@@ -17,4 +17,13 @@ export default defineConfig({
     },
   ],
   globalSetup: "./e2e/global-setup.ts",
+  // In CI, Playwright starts the server itself. Locally, docker compose is used.
+  webServer: process.env.CI
+    ? {
+        command: "npm run start",
+        port: 3000,
+        timeout: 120_000,
+        reuseExistingServer: false,
+      }
+    : undefined,
 });
