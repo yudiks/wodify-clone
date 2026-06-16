@@ -7,7 +7,7 @@ export default function Nav({ session }: { session: Session | null }) {
     <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <Link href="/" className="text-lg font-semibold tracking-tight">
-          FormCheck
+          FormCoachings
         </Link>
         <nav className="flex items-center gap-3 text-sm">
           {session ? (

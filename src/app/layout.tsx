@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FormCheck Coaching",
+  title: "FormCoachings",
   description: "Upload movement videos and get coach feedback with frame-by-frame annotations.",
 };
 

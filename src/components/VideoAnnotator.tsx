@@ -27,12 +27,12 @@ function YouTubePlayerSection({
   videoUrl,
   submissionId,
   annotations,
-  isCoach,
+  canAnnotate,
 }: {
   videoUrl: string;
   submissionId: string;
   annotations: Annotation[];
-  isCoach: boolean;
+  canAnnotate: boolean;
 }) {
   const router = useRouter();
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -117,7 +117,7 @@ function YouTubePlayerSection({
         </div>
       )}
 
-      {isCoach && (
+      {canAnnotate && (
         <div className="rounded border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
           <YouTubeAnnotationForm
             submissionId={submissionId}
@@ -237,12 +237,14 @@ export default function VideoAnnotator({
   videoUrl,
   annotations,
   isCoach,
+  canAnnotate,
   videoRef,
 }: {
   submissionId: string;
   videoUrl: string;
   annotations: Annotation[];
   isCoach: boolean;
+  canAnnotate: boolean;
   videoRef: React.RefObject<HTMLVideoElement | null>;
 }) {
   const router = useRouter();
@@ -375,7 +377,7 @@ export default function VideoAnnotator({
         videoUrl={videoUrl}
         submissionId={submissionId}
         annotations={annotations}
-        isCoach={isCoach}
+        canAnnotate={canAnnotate}
       />
     );
   }
@@ -450,7 +452,7 @@ export default function VideoAnnotator({
         </div>
       )}
 
-      {isCoach && (
+      {canAnnotate && (
         <div className="rounded border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
           {!drawing ? (
             <button

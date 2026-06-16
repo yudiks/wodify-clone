@@ -5,25 +5,32 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "COACH") {
-    return NextResponse.json({ error: "Only coaches can add annotations" }, { status: 403 });
-  }
 
   const { id } = await params;
+
+  const submission = await prisma.submission.findUnique({ where: { id } });
+  if (!submission) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  // Coaches can annotate any submission; athletes can only annotate their own
+  const isCoach = session.user.role === "COACH";
+  const isOwner = submission.athleteId === session.user.id;
+  if (!isCoach && !isOwner) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const { timestampSec, drawingDataUrl, note } = await req.json();
 
   if (typeof timestampSec !== "number" || timestampSec < 0) {
     return NextResponse.json({ error: "Invalid timestamp" }, { status: 400 });
   }
-  if (typeof drawingDataUrl !== "string" || !drawingDataUrl.startsWith("data:image/")) {
+  // drawingDataUrl is optional — empty string for YouTube/no-drawing annotations
+  if (typeof drawingDataUrl !== "string" ||
+      (drawingDataUrl !== "" && !drawingDataUrl.startsWith("data:image/"))) {
     return NextResponse.json({ error: "Invalid drawing data" }, { status: 400 });
   }
-  if (typeof note !== "string") {
+  if (typeof note !== "string" || !note.trim()) {
     return NextResponse.json({ error: "Note is required" }, { status: 400 });
   }
-
-  const submission = await prisma.submission.findUnique({ where: { id } });
-  if (!submission) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const annotation = await prisma.annotation.create({
     data: {
@@ -36,10 +43,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     include: { coach: { select: { name: true } } },
   });
 
-  await prisma.submission.update({
-    where: { id },
-    data: { status: "REVIEWED" },
-  });
+  // Only mark as REVIEWED when a coach annotates
+  if (isCoach) {
+    await prisma.submission.update({
+      where: { id },
+      data: { status: "REVIEWED" },
+    });
+  }
 
   return NextResponse.json(annotation, { status: 201 });
 }

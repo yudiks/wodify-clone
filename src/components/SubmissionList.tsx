@@ -3,7 +3,6 @@ import Link from "next/link";
 type SubmissionListItem = {
   id: string;
   title: string;
-  movementType: string;
   status: "PENDING" | "REVIEWED";
   createdAt: Date;
   athlete: { name: string };
@@ -36,8 +35,7 @@ export default function SubmissionList({
             <div className="min-w-0">
               <p className="truncate font-medium">{s.title}</p>
               <p className="truncate text-sm text-zinc-500 dark:text-zinc-400">
-                {s.movementType}
-                {showAthlete ? ` · ${s.athlete.name}` : ""} ·{" "}
+                {showAthlete ? `${s.athlete.name} · ` : ""}
                 {new Date(s.createdAt).toLocaleDateString()}
               </p>
             </div>

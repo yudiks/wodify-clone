@@ -26,13 +26,10 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json();
-  const { title, movementType, videoUrl } = body;
+  const { title, videoUrl } = body;
 
   if (typeof title !== "string" || !title.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
-  }
-  if (typeof movementType !== "string" || !movementType.trim()) {
-    return NextResponse.json({ error: "Movement type is required" }, { status: 400 });
   }
   if (typeof videoUrl !== "string" || !videoUrl.startsWith("https://")) {
     return NextResponse.json({ error: "Valid video URL is required" }, { status: 400 });
@@ -42,7 +39,7 @@ export async function POST(req: Request) {
     data: {
       athleteId: session.user.id,
       title: title.trim(),
-      movementType: movementType.trim(),
+      movementType: "",
       videoUrl,
     },
   });

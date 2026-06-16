@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import SubmissionReview from "@/components/SubmissionReview";
+import DeleteSubmissionButton from "@/components/DeleteSubmissionButton";
 
 export default async function SubmissionPage({
   params,
@@ -30,18 +31,23 @@ export default async function SubmissionPage({
 
   if (!submission) notFound();
 
-  if (session.user.role !== "COACH" && submission.athleteId !== session.user.id) {
+  const isCoach = session.user.role === "COACH";
+  const isOwner = submission.athleteId === session.user.id;
+
+  if (!isCoach && !isOwner) {
     redirect("/dashboard");
   }
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-8">
-      <div>
-        <h1 className="text-2xl font-bold">{submission.title}</h1>
-        <p className="text-sm text-zinc-500">
-          {submission.movementType} · {submission.athlete.name} ·{" "}
-          {new Date(submission.createdAt).toLocaleString()}
-        </p>
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">{submission.title}</h1>
+          <p className="text-sm text-zinc-500">
+            {submission.athlete.name} · {new Date(submission.createdAt).toLocaleString()}
+          </p>
+        </div>
+        {isOwner && <DeleteSubmissionButton submissionId={submission.id} />}
       </div>
       <SubmissionReview
         submissionId={submission.id}
@@ -54,7 +60,8 @@ export default async function SubmissionPage({
           ...c,
           createdAt: c.createdAt.toISOString(),
         }))}
-        isCoach={session.user.role === "COACH"}
+        isCoach={isCoach}
+        canAnnotate={isCoach || isOwner}
       />
     </div>
   );

@@ -27,12 +27,14 @@ export default function SubmissionReview({
   annotations,
   comments,
   isCoach,
+  canAnnotate,
 }: {
   submissionId: string;
   videoUrl: string;
   annotations: Annotation[];
   comments: Comment[];
   isCoach: boolean;
+  canAnnotate: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -43,6 +45,7 @@ export default function SubmissionReview({
         videoUrl={videoUrl}
         annotations={annotations}
         isCoach={isCoach}
+        canAnnotate={canAnnotate}
         videoRef={videoRef}
       />
       <CommentThread submissionId={submissionId} comments={comments} videoRef={videoRef} />

@@ -7,23 +7,135 @@ import { toYouTubeEmbedUrl, extractYouTubeId } from "@/lib/youtube";
 
 type Mode = "file" | "youtube";
 
+function formatTime(s: number) {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, "0")}`;
+}
+
+async function trimVideo(
+  file: File,
+  start: number,
+  end: number,
+  onProgress: (p: number) => void,
+): Promise<File> {
+  return new Promise((resolve) => {
+    const video = document.createElement("video");
+    video.muted = true;
+    const src = URL.createObjectURL(file);
+    video.src = src;
+
+    video.onloadedmetadata = () => {
+      // Detect browser support
+      const cap =
+        (video as HTMLVideoElement & { captureStream?: () => MediaStream; mozCaptureStream?: () => MediaStream })
+          .captureStream ??
+        (video as HTMLVideoElement & { captureStream?: () => MediaStream; mozCaptureStream?: () => MediaStream })
+          .mozCaptureStream;
+
+      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+        ? "video/webm;codecs=vp9"
+        : MediaRecorder.isTypeSupported("video/webm")
+        ? "video/webm"
+        : "";
+
+      if (!cap || !mimeType) {
+        URL.revokeObjectURL(src);
+        resolve(file);
+        return;
+      }
+
+      const stream = cap.call(video);
+      const recorder = new MediaRecorder(stream, { mimeType });
+      const chunks: BlobPart[] = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        URL.revokeObjectURL(src);
+        const blob = new Blob(chunks, { type: "video/webm" });
+        const trimmed = new File(
+          [blob],
+          file.name.replace(/\.[^.]+$/, ".webm"),
+          { type: "video/webm" },
+        );
+        onProgress(1);
+        resolve(trimmed);
+      };
+
+      video.currentTime = start;
+      video.onseeked = () => {
+        const duration = end - start;
+        let elapsed = 0;
+        const tick = setInterval(() => {
+          elapsed += 0.2;
+          onProgress(Math.min(elapsed / duration, 0.95));
+        }, 200);
+
+        recorder.start(200);
+        video.play();
+
+        setTimeout(() => {
+          clearInterval(tick);
+          recorder.stop();
+          video.pause();
+        }, duration * 1000 + 300);
+      };
+
+      video.onerror = () => { URL.revokeObjectURL(src); resolve(file); };
+    };
+
+    video.onerror = () => resolve(file);
+  });
+}
+
 export default function UploadForm() {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const previewRef = useRef<HTMLVideoElement>(null);
+
   const [mode, setMode] = useState<Mode>("file");
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<string | null>(null);
 
+  // Trim state
+  const [videoObjectUrl, setVideoObjectUrl] = useState<string | null>(null);
+  const [videoDuration, setVideoDuration] = useState(0);
+  const [trimStart, setTrimStart] = useState(0);
+  const [trimEnd, setTrimEnd] = useState(0);
+  const [trimProgress, setTrimProgress] = useState<number | null>(null);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (videoObjectUrl) URL.revokeObjectURL(videoObjectUrl);
+    if (!file) { setVideoObjectUrl(null); return; }
+    const url = URL.createObjectURL(file);
+    setVideoObjectUrl(url);
+    setTrimStart(0);
+    setTrimEnd(0);
+    setVideoDuration(0);
+  }
+
+  function handleMetadataLoaded() {
+    const dur = previewRef.current?.duration ?? 0;
+    setVideoDuration(isFinite(dur) ? dur : 0);
+    setTrimEnd(isFinite(dur) ? dur : 0);
+  }
+
+  const isTrimmed = trimStart > 0 || (videoDuration > 0 && trimEnd < videoDuration);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    setTrimProgress(null);
 
     const formData = new FormData(e.currentTarget);
     const title = formData.get("title") as string;
-    const movementType = formData.get("movementType") as string;
 
     try {
       let videoUrl: string;
@@ -36,8 +148,16 @@ export default function UploadForm() {
         }
         videoUrl = embedUrl;
       } else {
-        const file = formData.get("video") as File;
-        setProgress("Uploading video...");
+        let file = formData.get("video") as File;
+
+        if (isTrimmed && videoDuration > 0) {
+          setProgress("Trimming video… (plays in real-time)");
+          setTrimProgress(0);
+          file = await trimVideo(file, trimStart, trimEnd, (p) => setTrimProgress(p));
+          setTrimProgress(null);
+        }
+
+        setProgress("Uploading video…");
         const blob = await upload(file.name, file, {
           access: "public",
           handleUploadUrl: "/api/submissions/upload",
@@ -45,27 +165,30 @@ export default function UploadForm() {
         videoUrl = blob.url;
       }
 
-      setProgress("Saving submission...");
+      setProgress("Saving…");
       const res = await fetch("/api/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, movementType, videoUrl }),
+        body: JSON.stringify({ title, videoUrl }),
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error ?? "Upload failed");
+        setError((data as { error?: string }).error ?? "Upload failed");
         return;
       }
 
       formRef.current?.reset();
       setYoutubeUrl("");
+      setVideoObjectUrl(null);
+      setVideoDuration(0);
       router.refresh();
     } catch (err) {
       setError((err as Error).message ?? "Upload failed");
     } finally {
       setLoading(false);
       setProgress(null);
+      setTrimProgress(null);
     }
   }
 
@@ -85,16 +208,6 @@ export default function UploadForm() {
           name="title"
           required
           placeholder="e.g. Heavy single snatch attempt"
-          className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
-        />
-      </label>
-
-      <label className="flex flex-col gap-1 text-sm">
-        Movement
-        <input
-          name="movementType"
-          required
-          placeholder="e.g. Snatch"
           className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
         />
       </label>
@@ -126,16 +239,92 @@ export default function UploadForm() {
       </div>
 
       {mode === "file" ? (
-        <label className="flex flex-col gap-1 text-sm">
-          Video file
-          <input
-            name="video"
-            type="file"
-            accept="video/*"
-            required
-            className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-          />
-        </label>
+        <>
+          <label className="flex flex-col gap-1 text-sm">
+            Video file
+            <input
+              name="video"
+              type="file"
+              accept="video/*"
+              required
+              onChange={handleFileChange}
+              className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            />
+          </label>
+
+          {/* Trim UI */}
+          {videoObjectUrl && (
+            <div className="flex flex-col gap-2 rounded border border-zinc-200 p-3 dark:border-zinc-700">
+              <video
+                ref={previewRef}
+                src={videoObjectUrl}
+                controls
+                onLoadedMetadata={handleMetadataLoaded}
+                className="max-h-48 w-full rounded bg-black object-contain"
+              />
+
+              {videoDuration > 0 && (
+                <>
+                  <div className="flex items-center justify-between text-xs text-zinc-500">
+                    <span>Trim</span>
+                    <span>
+                      {formatTime(trimStart)} → {formatTime(trimEnd)}{" "}
+                      <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                        ({formatTime(trimEnd - trimStart)})
+                      </span>
+                    </span>
+                  </div>
+                  <label className="flex flex-col gap-1 text-xs text-zinc-500">
+                    Start
+                    <input
+                      type="range"
+                      min={0}
+                      max={videoDuration}
+                      step={0.1}
+                      value={trimStart}
+                      onChange={(e) => {
+                        const v = Number(e.target.value);
+                        setTrimStart(Math.min(v, trimEnd - 0.5));
+                        if (previewRef.current) previewRef.current.currentTime = v;
+                      }}
+                      className="w-full accent-zinc-900 dark:accent-zinc-100"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1 text-xs text-zinc-500">
+                    End
+                    <input
+                      type="range"
+                      min={0}
+                      max={videoDuration}
+                      step={0.1}
+                      value={trimEnd}
+                      onChange={(e) => {
+                        const v = Number(e.target.value);
+                        setTrimEnd(Math.max(v, trimStart + 0.5));
+                        if (previewRef.current) previewRef.current.currentTime = v;
+                      }}
+                      className="w-full accent-zinc-900 dark:accent-zinc-100"
+                    />
+                  </label>
+                  {isTrimmed && (
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Trimming re-plays the clip in real-time ({formatTime(trimEnd - trimStart)}).
+                    </p>
+                  )}
+                </>
+              )}
+
+              {trimProgress !== null && (
+                <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+                  <div
+                    className="h-full rounded-full bg-zinc-900 transition-all dark:bg-zinc-100"
+                    style={{ width: `${Math.round(trimProgress * 100)}%` }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </>
       ) : (
         <label className="flex flex-col gap-1 text-sm">
           YouTube URL
@@ -143,7 +332,7 @@ export default function UploadForm() {
             type="url"
             value={youtubeUrl}
             onChange={(e) => setYoutubeUrl(e.target.value)}
-            placeholder="https://www.youtube.com/watch?v=..."
+            placeholder="https://www.youtube.com/watch?v=…"
             required
             className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
           />
@@ -160,9 +349,9 @@ export default function UploadForm() {
       <button
         type="submit"
         disabled={loading || (mode === "youtube" && !youtubeValid)}
-        className="self-start rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        className="w-full rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300 sm:w-auto"
       >
-        {loading ? (progress ?? "Saving...") : mode === "youtube" ? "Add video" : "Upload"}
+        {loading ? (progress ?? "Saving…") : mode === "youtube" ? "Add video" : "Upload"}
       </button>
     </form>
   );
