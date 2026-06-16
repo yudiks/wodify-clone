@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { isYouTubeUrl } from "@/lib/youtube";
 
 type Annotation = {
   id: string;
@@ -154,6 +155,53 @@ export default function VideoAnnotator({
     router.refresh();
   }
 
+  const isYouTube = isYouTubeUrl(videoUrl);
+
+  if (isYouTube) {
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="relative w-full overflow-hidden rounded bg-black" style={{ aspectRatio: "16/9" }}>
+          <iframe
+            src={videoUrl}
+            className="absolute inset-0 h-full w-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+        {annotations.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {annotations.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => setActiveAnnotation(activeAnnotation?.id === a.id ? null : a)}
+                className={`rounded border px-2 py-1 text-xs ${
+                  activeAnnotation?.id === a.id
+                    ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                    : "border-zinc-300 hover:border-zinc-500 dark:border-zinc-700 dark:hover:border-zinc-400"
+                }`}
+              >
+                {formatTime(a.timestampSec)}
+              </button>
+            ))}
+          </div>
+        )}
+        {activeAnnotation && (
+          <div className="rounded border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <p className="font-medium">
+              {activeAnnotation.coach.name} at {formatTime(activeAnnotation.timestampSec)}
+            </p>
+            <p className="text-zinc-700 dark:text-zinc-300">{activeAnnotation.note}</p>
+          </div>
+        )}
+        {isCoach && (
+          <div className="rounded border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
+            <YouTubeAnnotationForm submissionId={submissionId} annotations={annotations} router={router} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <div ref={containerRef} className="relative w-full overflow-hidden rounded bg-black">
@@ -161,7 +209,7 @@ export default function VideoAnnotator({
           ref={videoRef}
           src={videoUrl}
           controls
-          className="w-full"
+          className="max-h-72 w-full object-contain"
           onPlay={() => {
             if (activeAnnotation) {
               setActiveAnnotation(null);
@@ -289,6 +337,93 @@ export default function VideoAnnotator({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function YouTubeAnnotationForm({
+  submissionId,
+  annotations,
+  router,
+}: {
+  submissionId: string;
+  annotations: Annotation[];
+  router: ReturnType<typeof useRouter>;
+}) {
+  const [note, setNote] = useState("");
+  const [timestampSec, setTimestampSec] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+
+  async function save() {
+    setSaving(true);
+    setError(null);
+    const res = await fetch(`/api/submissions/${submissionId}/annotations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ timestampSec, drawingDataUrl: "", note }),
+    });
+    setSaving(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Failed to save");
+      return;
+    }
+    setNote("");
+    setOpen(false);
+    router.refresh();
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700"
+      >
+        Add annotation
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm text-zinc-500">
+        Pause the YouTube video at the moment you want to annotate, note the timestamp, then add your note.
+      </p>
+      <label className="flex flex-col gap-1 text-sm">
+        Timestamp (seconds)
+        <input
+          type="number"
+          min={0}
+          value={timestampSec}
+          onChange={(e) => setTimestampSec(Number(e.target.value))}
+          className="w-32 rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+        />
+      </label>
+      <textarea
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="What should the athlete focus on?"
+        className="rounded border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
+        rows={3}
+      />
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <div className="flex gap-2">
+        <button
+          onClick={save}
+          disabled={saving || !note.trim()}
+          className="rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save annotation"}
+        </button>
+        <button
+          onClick={() => setOpen(false)}
+          className="rounded border border-zinc-300 px-4 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   );
 }
