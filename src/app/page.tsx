@@ -14,7 +14,7 @@ export default async function Home() {
       <h1 className="text-4xl font-bold tracking-tight">
         Get coached on every rep
       </h1>
-      <p className="max-w-xl text-lg text-zinc-600">
+      <p className="max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
         Record a movement on your phone, upload it, and get frame-by-frame
         feedback from your coach — drawings, notes, and timestamped comments
         right on your video.
@@ -22,13 +22,13 @@ export default async function Home() {
       <div className="flex gap-3">
         <Link
           href="/register"
-          className="rounded bg-zinc-900 px-5 py-2.5 text-white hover:bg-zinc-700"
+          className="rounded bg-zinc-900 px-5 py-2.5 text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
         >
           Get started
         </Link>
         <Link
           href="/login"
-          className="rounded border border-zinc-300 px-5 py-2.5 hover:bg-zinc-100"
+          className="rounded border border-zinc-300 px-5 py-2.5 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
         >
           Log in
         </Link>

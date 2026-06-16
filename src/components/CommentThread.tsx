@@ -65,18 +65,18 @@ export default function CommentThread({
     <div className="flex flex-col gap-3">
       <h2 className="font-semibold">Comments</h2>
       {comments.length === 0 ? (
-        <p className="text-sm text-zinc-500">No comments yet.</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">No comments yet.</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {comments.map((c) => (
-            <li key={c.id} className="rounded border border-zinc-200 bg-white p-3 text-sm">
-              <div className="mb-1 flex items-center gap-2 text-xs text-zinc-500">
-                <span className="font-medium text-zinc-700">{c.author.name}</span>
+            <li key={c.id} className="rounded border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="mb-1 flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                <span className="font-medium text-zinc-700 dark:text-zinc-300">{c.author.name}</span>
                 <span>· {c.author.role}</span>
                 {c.timestampSec != null && (
                   <button
                     onClick={() => seekTo(c.timestampSec!)}
-                    className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono hover:bg-zinc-200"
+                    className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono hover:bg-zinc-200 dark:bg-zinc-700 dark:hover:bg-zinc-600"
                   >
                     {formatTime(c.timestampSec)}
                   </button>
@@ -93,9 +93,9 @@ export default function CommentThread({
           onChange={(e) => setText(e.target.value)}
           placeholder="Add a comment..."
           rows={2}
-          className="rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="rounded border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
         />
-        <label className="flex items-center gap-2 text-xs text-zinc-600">
+        <label className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
           <input
             type="checkbox"
             checked={tagTime}
@@ -103,11 +103,11 @@ export default function CommentThread({
           />
           Tag current video time
         </label>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
         <button
           type="submit"
           disabled={submitting || !text.trim()}
-          className="self-start rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
+          className="self-start rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
         >
           {submitting ? "Posting..." : "Post comment"}
         </button>

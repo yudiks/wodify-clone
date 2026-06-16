@@ -19,7 +19,7 @@ export default function SubmissionList({
 }) {
   if (submissions.length === 0) {
     return (
-      <p className="rounded border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500">
+      <p className="rounded border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
         No submissions yet.
       </p>
     );
@@ -31,18 +31,18 @@ export default function SubmissionList({
         <li key={s.id}>
           <Link
             href={`/submissions/${s.id}`}
-            className="flex items-center justify-between rounded border border-zinc-200 bg-white p-4 hover:border-zinc-400"
+            className="flex items-center justify-between rounded border border-zinc-200 bg-white p-4 hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-600"
           >
             <div>
               <p className="font-medium">{s.title}</p>
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 {s.movementType}
                 {showAthlete ? ` · ${s.athlete.name}` : ""} ·{" "}
                 {new Date(s.createdAt).toLocaleDateString()}
               </p>
             </div>
             <div className="flex items-center gap-3 text-sm">
-              <span className="text-zinc-500">
+              <span className="text-zinc-500 dark:text-zinc-400">
                 {s._count.annotations} annotation
                 {s._count.annotations === 1 ? "" : "s"} ·{" "}
                 {s._count.comments} comment{s._count.comments === 1 ? "" : "s"}
@@ -50,8 +50,8 @@ export default function SubmissionList({
               <span
                 className={`rounded px-2 py-1 text-xs font-medium ${
                   s.status === "REVIEWED"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-amber-100 text-amber-700"
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
+                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
                 }`}
               >
                 {s.status === "REVIEWED" ? "Reviewed" : "Pending"}

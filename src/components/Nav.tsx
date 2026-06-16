@@ -4,7 +4,7 @@ import SignOutButton from "@/components/SignOutButton";
 
 export default function Nav({ session }: { session: Session | null }) {
   return (
-    <header className="border-b border-zinc-200 bg-white">
+    <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <Link href="/" className="text-lg font-semibold tracking-tight">
           FormCheck
@@ -22,7 +22,7 @@ export default function Nav({ session }: { session: Session | null }) {
                   Coach Inbox
                 </Link>
               )}
-              <span className="text-zinc-500">
+              <span className="text-zinc-500 dark:text-zinc-400">
                 {session.user.name} ({session.user.role})
               </span>
               <SignOutButton />
@@ -34,7 +34,7 @@ export default function Nav({ session }: { session: Session | null }) {
               </Link>
               <Link
                 href="/register"
-                className="rounded bg-zinc-900 px-3 py-1.5 text-white hover:bg-zinc-700"
+                className="rounded bg-zinc-900 px-3 py-1.5 text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
               >
                 Sign up
               </Link>

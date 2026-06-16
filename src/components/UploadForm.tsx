@@ -55,7 +55,7 @@ export default function UploadForm() {
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 rounded border border-zinc-200 bg-white p-4"
+      className="flex flex-col gap-3 rounded border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
     >
       <h2 className="font-semibold">Upload a new video</h2>
       <label className="flex flex-col gap-1 text-sm">
@@ -64,7 +64,7 @@ export default function UploadForm() {
           name="title"
           required
           placeholder="e.g. Heavy single snatch attempt"
-          className="rounded border border-zinc-300 px-3 py-2"
+          className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
         />
       </label>
       <label className="flex flex-col gap-1 text-sm">
@@ -73,7 +73,7 @@ export default function UploadForm() {
           name="movementType"
           required
           placeholder="e.g. Snatch"
-          className="rounded border border-zinc-300 px-3 py-2"
+          className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
         />
       </label>
       <label className="flex flex-col gap-1 text-sm">
@@ -83,14 +83,14 @@ export default function UploadForm() {
           type="file"
           accept="video/*"
           required
-          className="rounded border border-zinc-300 px-3 py-2"
+          className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
         />
       </label>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       <button
         type="submit"
         disabled={loading}
-        className="self-start rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
+        className="self-start rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
       >
         {loading ? (progress ?? "Uploading...") : "Upload"}
       </button>

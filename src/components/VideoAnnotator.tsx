@@ -205,8 +205,8 @@ export default function VideoAnnotator({
               onClick={() => viewAnnotation(a)}
               className={`rounded border px-2 py-1 text-xs ${
                 activeAnnotation?.id === a.id
-                  ? "border-zinc-900 bg-zinc-900 text-white"
-                  : "border-zinc-300 hover:border-zinc-500"
+                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                  : "border-zinc-300 hover:border-zinc-500 dark:border-zinc-700 dark:hover:border-zinc-400"
               }`}
             >
               {formatTime(a.timestampSec)}
@@ -216,16 +216,16 @@ export default function VideoAnnotator({
       )}
 
       {activeAnnotation && (
-        <div className="rounded border border-zinc-200 bg-white p-3 text-sm">
+        <div className="rounded border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
           <p className="font-medium">
             {activeAnnotation.coach.name} at {formatTime(activeAnnotation.timestampSec)}
           </p>
-          <p className="text-zinc-700">{activeAnnotation.note}</p>
+          <p className="text-zinc-700 dark:text-zinc-300">{activeAnnotation.note}</p>
         </div>
       )}
 
       {isCoach && (
-        <div className="rounded border border-zinc-200 bg-white p-3">
+        <div className="rounded border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
           {!drawing ? (
             <button
               onClick={startNewAnnotation}
@@ -235,7 +235,7 @@ export default function VideoAnnotator({
             </button>
           ) : (
             <div className="flex flex-col gap-3">
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 Pause the video where you want to comment, draw on the frame
                 below, add a note, then save. ({formatTime(videoRef.current?.currentTime ?? 0)})
               </p>
@@ -246,7 +246,7 @@ export default function VideoAnnotator({
                     key={c}
                     onClick={() => setColor(c)}
                     className={`h-6 w-6 rounded-full border-2 ${
-                      color === c ? "border-zinc-900" : "border-transparent"
+                      color === c ? "border-zinc-900 dark:border-zinc-100" : "border-transparent"
                     }`}
                     style={{ backgroundColor: c }}
                     aria-label={`Color ${c}`}
@@ -254,7 +254,7 @@ export default function VideoAnnotator({
                 ))}
                 <button
                   onClick={clearCanvas}
-                  className="ml-2 rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-100"
+                  className="ml-2 rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
                 >
                   Clear drawing
                 </button>
@@ -263,7 +263,7 @@ export default function VideoAnnotator({
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="What should the athlete focus on?"
-                className="rounded border border-zinc-300 px-3 py-2 text-sm"
+                className="rounded border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
                 rows={3}
               />
               {error && <p className="text-sm text-red-600">{error}</p>}
@@ -280,7 +280,7 @@ export default function VideoAnnotator({
                     setDrawing(false);
                     clearCanvas();
                   }}
-                  className="rounded border border-zinc-300 px-4 py-2 text-sm hover:bg-zinc-100"
+                  className="rounded border border-zinc-300 px-4 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
                 >
                   Cancel
                 </button>

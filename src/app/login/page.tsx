@@ -46,7 +46,7 @@ function LoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded border border-zinc-300 px-3 py-2"
+            className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -56,7 +56,7 @@ function LoginForm() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="rounded border border-zinc-300 px-3 py-2"
+            className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
           />
         </label>
         {error && <p className="text-sm text-red-600">{error}</p>}
@@ -68,7 +68,7 @@ function LoginForm() {
           {loading ? "Logging in..." : "Log in"}
         </button>
       </form>
-      <p className="mt-4 text-sm text-zinc-600">
+      <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
         Don&apos;t have an account?{" "}
         <Link href="/register" className="underline">
           Sign up
