@@ -9,7 +9,7 @@ export default function Nav({ session }: { session: Session | null }) {
         <Link href="/" className="text-lg font-semibold tracking-tight">
           FormCheck
         </Link>
-        <nav className="flex items-center gap-4 text-sm">
+        <nav className="flex items-center gap-3 text-sm">
           {session ? (
             <>
               {session.user.role === "ATHLETE" && (
@@ -22,8 +22,9 @@ export default function Nav({ session }: { session: Session | null }) {
                   Coach Inbox
                 </Link>
               )}
-              <span className="text-zinc-500 dark:text-zinc-400">
-                {session.user.name} ({session.user.role})
+              <span className="hidden text-zinc-500 sm:inline dark:text-zinc-400">
+                {session.user.name}
+                <span className="hidden md:inline"> ({session.user.role})</span>
               </span>
               <SignOutButton />
             </>
