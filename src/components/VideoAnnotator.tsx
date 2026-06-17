@@ -289,14 +289,14 @@ export default function VideoAnnotator({
   }
 
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
-    if (!isCoach || !drawing) return;
+    if (!drawing) return;
     e.preventDefault();
     isDrawingRef.current = true;
     lastPointRef.current = getCanvasPoint(e);
   }
 
   function handlePointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
-    if (!isCoach || !drawing || !isDrawingRef.current) return;
+    if (!drawing || !isDrawingRef.current) return;
     e.preventDefault();
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
