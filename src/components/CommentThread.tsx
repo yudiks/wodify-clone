@@ -63,46 +63,49 @@ export default function CommentThread({
 
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="font-semibold">Comments</h2>
+      <h2 className="font-semibold" style={{ fontFamily: "var(--font-outfit)" }}>Comments</h2>
       {comments.length === 0 ? (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">No comments yet.</p>
+        <p className="text-sm" style={{ color: "var(--text-muted)" }}>No comments yet.</p>
       ) : (
-        <ul className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <ul className="card-glass flex flex-col gap-4 p-4">
           {comments.map((c) => {
             const isCoach = c.author.role === "COACH";
             return (
               <li key={c.id} className="flex items-start gap-3">
                 <div
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                  style={
                     isCoach
-                      ? "bg-indigo-100 text-indigo-700"
-                      : "bg-emerald-100 text-emerald-700"
-                  }`}
+                      ? { background: "rgba(41,121,255,0.15)", color: "var(--accent-blue)" }
+                      : { background: "var(--accent-green-bg)", color: "var(--accent-green)" }
+                  }
                 >
                   {initials(c.author.name)}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{c.author.name}</span>
+                    <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{c.author.name}</span>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      className="rounded-full px-2 py-0.5 text-xs font-medium"
+                      style={
                         isCoach
-                          ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300"
-                          : "bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300"
-                      }`}
+                          ? { background: "rgba(41,121,255,0.1)", color: "var(--accent-blue)" }
+                          : { background: "var(--accent-green-bg)", color: "var(--accent-green)" }
+                      }
                     >
                       {isCoach ? "Coach" : "Athlete"}
                     </span>
                     {c.timestampSec != null && (
                       <button
                         onClick={() => seekTo(c.timestampSec!)}
-                        className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                        className="rounded px-1.5 py-0.5 font-mono text-xs hover:brightness-125"
+                        style={{ background: "var(--bg-tertiary)", color: "var(--text-muted)" }}
                       >
                         {formatTime(c.timestampSec)}
                       </button>
                     )}
                   </div>
-                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{c.text}</p>
+                  <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>{c.text}</p>
                 </div>
               </li>
             );
@@ -115,9 +118,10 @@ export default function CommentThread({
           onChange={(e) => setText(e.target.value)}
           placeholder="Add a comment..."
           rows={2}
-          className="rounded border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
+          className="rounded-lg border px-3 py-2 text-sm"
+          style={{ borderColor: "var(--border-color)", background: "var(--bg-tertiary)", color: "var(--text-primary)" }}
         />
-        <label className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+        <label className="flex items-center gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
           <input
             type="checkbox"
             checked={tagTime}
@@ -125,11 +129,11 @@ export default function CommentThread({
           />
           Tag current video time
         </label>
-        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+        {error && <p className="text-sm" style={{ color: "var(--accent-red)" }}>{error}</p>}
         <button
           type="submit"
           disabled={submitting || !text.trim()}
-          className="self-start rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
+          className="btn-glow-blue self-start rounded-lg px-4 py-2 text-sm disabled:opacity-50"
         >
           {submitting ? "Posting..." : "Post comment"}
         </button>

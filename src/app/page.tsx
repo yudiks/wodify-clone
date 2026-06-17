@@ -13,13 +13,19 @@ export default async function Home() {
     <div className="mx-auto flex max-w-3xl flex-col gap-16 px-4 py-16">
       {/* Hero */}
       <div className="flex flex-col items-center gap-6 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700">
+        <div
+          className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium"
+          style={{ background: "rgba(41,121,255,0.1)", color: "var(--accent-blue)" }}
+        >
           Frame-by-frame coaching
         </div>
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-          Get coached on every rep
+        <h1
+          className="text-4xl font-bold tracking-tight sm:text-5xl"
+          style={{ fontFamily: "var(--font-outfit)" }}
+        >
+          Get coached on <span className="brand-gradient-text">every rep</span>
         </h1>
-        <p className="max-w-xl text-lg text-zinc-500">
+        <p className="max-w-xl text-lg" style={{ color: "var(--text-secondary)" }}>
           Record a movement on your phone, upload it, and get frame-by-frame
           feedback from your coach — drawings, notes, and timestamped comments
           right on your video.
@@ -27,13 +33,14 @@ export default async function Home() {
         <div className="flex gap-3">
           <Link
             href="/register"
-            className="rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white hover:bg-indigo-700"
+            className="btn-glow-blue rounded-lg px-5 py-2.5 font-medium"
           >
             Get started
           </Link>
           <Link
             href="/login"
-            className="rounded-lg border border-zinc-300 px-5 py-2.5 font-medium hover:bg-zinc-50"
+            className="rounded-lg border px-5 py-2.5 font-medium hover:bg-white/5"
+            style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}
           >
             Log in
           </Link>
@@ -42,14 +49,17 @@ export default async function Home() {
 
       {/* Annotated video demo mockup */}
       <div className="flex flex-col gap-4">
-        <h2 className="text-center text-sm font-semibold uppercase tracking-widest text-zinc-400">
+        <h2
+          className="text-center text-sm font-semibold uppercase tracking-widest"
+          style={{ color: "var(--text-muted)" }}
+        >
           How it works
         </h2>
 
         {/* Mock video + annotation panel */}
-        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-md">
+        <div className="card-glass overflow-hidden shadow-[var(--shadow-main)]">
           {/* Fake video frame */}
-          <div className="relative w-full bg-zinc-700" style={{ aspectRatio: "16/9" }}>
+          <div className="relative w-full" style={{ aspectRatio: "16/9", background: "var(--bg-tertiary)" }}>
             {/* Simulated video still — dark background with athlete silhouette feel */}
             <div className="absolute inset-0 flex items-center justify-center">
               <svg viewBox="0 0 640 360" className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
@@ -87,18 +97,31 @@ export default async function Home() {
           </div>
 
           {/* Annotation card */}
-          <div className="flex flex-col gap-3 border-t border-zinc-100 p-4">
+          <div className="flex flex-col gap-3 border-t p-4" style={{ borderColor: "var(--border-color)" }}>
             <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+              <div
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                style={{ background: "rgba(41,121,255,0.15)", color: "var(--accent-blue)" }}
+              >
                 SC
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-zinc-900">Coach Sarah</span>
-                  <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600">Coach</span>
-                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-500">0:12</span>
+                  <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>Coach Sarah</span>
+                  <span
+                    className="rounded-full px-2 py-0.5 text-xs font-medium"
+                    style={{ background: "rgba(41,121,255,0.1)", color: "var(--accent-blue)" }}
+                  >
+                    Coach
+                  </span>
+                  <span
+                    className="rounded px-1.5 py-0.5 font-mono text-xs"
+                    style={{ background: "var(--bg-tertiary)", color: "var(--text-muted)" }}
+                  >
+                    0:12
+                  </span>
                 </div>
-                <p className="mt-1 text-sm text-zinc-600">
+                <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
                   Your hips are shooting up too fast out of the hole — drive your chest up first so the bar stays over mid-foot. I&apos;ve circled the problem spot in yellow.
                 </p>
               </div>
@@ -106,16 +129,29 @@ export default async function Home() {
 
             {/* Second annotation */}
             <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">
+              <div
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                style={{ background: "var(--accent-green-bg)", color: "var(--accent-green)" }}
+              >
                 SC
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-zinc-900">Coach Sarah</span>
-                  <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600">Coach</span>
-                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-500">0:24</span>
+                  <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>Coach Sarah</span>
+                  <span
+                    className="rounded-full px-2 py-0.5 text-xs font-medium"
+                    style={{ background: "rgba(41,121,255,0.1)", color: "var(--accent-blue)" }}
+                  >
+                    Coach
+                  </span>
+                  <span
+                    className="rounded px-1.5 py-0.5 font-mono text-xs"
+                    style={{ background: "var(--bg-tertiary)", color: "var(--text-muted)" }}
+                  >
+                    0:24
+                  </span>
                 </div>
-                <p className="mt-1 text-sm text-zinc-600">
+                <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
                   Knee tracking looks great here — see how the red line follows right over your toes. Keep this for every rep.
                 </p>
               </div>
@@ -143,10 +179,10 @@ export default async function Home() {
             body: "Watch the feedback overlay play back in sync with your video. Fix it next session.",
           },
         ].map(({ n, title, body }) => (
-          <div key={n} className="flex flex-col gap-2 rounded-xl border border-zinc-100 bg-zinc-50 p-5">
-            <span className="text-2xl font-bold text-indigo-600">{n}</span>
-            <p className="font-semibold text-zinc-900">{title}</p>
-            <p className="text-sm text-zinc-500">{body}</p>
+          <div key={n} className="card-glass flex flex-col gap-2 p-5">
+            <span className="text-2xl font-bold brand-gradient-text" style={{ fontFamily: "var(--font-outfit)" }}>{n}</span>
+            <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{title}</p>
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{body}</p>
           </div>
         ))}
       </div>

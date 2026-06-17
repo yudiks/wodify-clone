@@ -62,7 +62,7 @@ export default function SharePage({ params }: { params: Promise<{ token: string 
   if (loading) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-8">
-        <p className="text-center text-zinc-500">Loading...</p>
+        <p className="text-center" style={{ color: "var(--text-muted)" }}>Loading...</p>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function SharePage({ params }: { params: Promise<{ token: string 
   if (error) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-8">
-        <p className="text-center text-red-500">Error: {error}</p>
+        <p className="text-center" style={{ color: "var(--accent-red)" }}>Error: {error}</p>
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function SharePage({ params }: { params: Promise<{ token: string 
   if (!submission) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-8">
-        <p className="text-center text-zinc-500">Submission not found</p>
+        <p className="text-center" style={{ color: "var(--text-muted)" }}>Submission not found</p>
       </div>
     );
   }
@@ -86,8 +86,8 @@ export default function SharePage({ params }: { params: Promise<{ token: string 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-8">
       <div>
-        <h1 className="text-2xl font-bold">{submission.title}</h1>
-        <p className="text-sm text-zinc-500">
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-outfit)" }}>{submission.title}</h1>
+        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
           {submission.movementType} · {submission.athlete.name} ·{" "}
           {new Date(submission.createdAt).toLocaleString()}
         </p>

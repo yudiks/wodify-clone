@@ -2,57 +2,84 @@ import Link from "next/link";
 import type { Session } from "next-auth";
 import SignOutButton from "@/components/SignOutButton";
 
-export default function Nav({ session }: { session: Session | null }) {
+function Logo() {
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/90 backdrop-blur-sm dark:border-zinc-800/80 dark:bg-zinc-900/90">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-900 text-xs font-bold text-white dark:bg-zinc-100 dark:text-zinc-900">
-            FC
+    <Link href="/" className="flex items-center gap-3">
+      <span
+        className="brand-gradient flex h-9 w-9 items-center justify-center rounded-lg text-sm font-bold text-white"
+        style={{ fontFamily: "var(--font-outfit)" }}
+      >
+        FC
+      </span>
+      <span
+        className="text-lg font-bold tracking-tight"
+        style={{ fontFamily: "var(--font-outfit)" }}
+      >
+        Form<span className="brand-gradient-text">Coach</span>
+      </span>
+    </Link>
+  );
+}
+
+export default function Nav({ session }: { session: Session | null }) {
+  if (session) {
+    const links =
+      session.user.role === "ATHLETE"
+        ? [{ href: "/dashboard", label: "My Submissions" }]
+        : [{ href: "/coach", label: "Coach Inbox" }];
+
+    return (
+      <aside
+        className="fixed inset-y-0 left-0 z-50 hidden w-60 flex-col border-r p-6 lg:flex"
+        style={{ background: "var(--bg-secondary)", borderColor: "var(--border-color)" }}
+      >
+        <div className="mb-10">
+          <Logo />
+        </div>
+        <nav className="flex flex-1 flex-col gap-1">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/5"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex items-center justify-between border-t pt-4" style={{ borderColor: "var(--border-color)" }}>
+          <span className="truncate text-xs" style={{ color: "var(--text-muted)" }}>
+            {session.user.name}
           </span>
-          <span className="font-semibold tracking-tight">Form Coach</span>
-        </Link>
+          <SignOutButton />
+        </div>
+      </aside>
+    );
+  }
+
+  return (
+    <header
+      className="sticky top-0 z-50 border-b backdrop-blur-sm"
+      style={{ borderColor: "var(--border-color)", background: "rgba(11,12,15,0.85)" }}
+    >
+      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+        <Logo />
 
         <nav className="flex items-center gap-2 text-sm">
-          {session ? (
-            <>
-              {session.user.role === "ATHLETE" && (
-                <Link
-                  href="/dashboard"
-                  className="rounded-lg px-3 py-1.5 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-                >
-                  My Submissions
-                </Link>
-              )}
-              {session.user.role === "COACH" && (
-                <Link
-                  href="/coach"
-                  className="rounded-lg px-3 py-1.5 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-                >
-                  Coach Inbox
-                </Link>
-              )}
-              <span className="hidden text-xs text-zinc-400 sm:inline dark:text-zinc-500">
-                {session.user.name}
-              </span>
-              <SignOutButton />
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="rounded-lg px-3 py-1.5 text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-              >
-                Sign up
-              </Link>
-            </>
-          )}
+          <Link
+            href="/login"
+            className="rounded-lg px-3 py-1.5 transition-colors hover:bg-white/5"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            Log in
+          </Link>
+          <Link
+            href="/register"
+            className="btn-glow-blue rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+          >
+            Sign up
+          </Link>
         </nav>
       </div>
     </header>

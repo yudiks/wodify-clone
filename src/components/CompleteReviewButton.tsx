@@ -34,9 +34,7 @@ export default function CompleteReviewButton({
       disabled={loading}
       title={isReviewed ? "Mark as pending" : "Mark feedback as complete"}
       className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 ${
-        isReviewed
-          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
-          : "bg-indigo-600 text-white hover:bg-indigo-700"
+        isReviewed ? "status-pill reviewed" : "btn-glow-blue"
       }`}
     >
       {isReviewed ? (

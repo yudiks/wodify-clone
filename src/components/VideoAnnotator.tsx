@@ -30,6 +30,46 @@ function initials(name: string): string {
     .join("");
 }
 
+function AnnotationPill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-lg border px-2 py-1 text-xs transition-colors ${active ? "btn-glow-blue border-transparent" : "hover:border-[var(--border-active)]"}`}
+      style={active ? undefined : { borderColor: "var(--border-color)", color: "var(--text-secondary)" }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function ActiveAnnotationCard({ annotation }: { annotation: Annotation }) {
+  return (
+    <div className="card-glass flex items-start gap-3 p-3 text-sm">
+      <div
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+        style={{ background: "rgba(41,121,255,0.15)", color: "var(--accent-blue)" }}
+      >
+        {initials(annotation.coach.name)}
+      </div>
+      <div className="flex-1">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{annotation.coach.name}</span>
+          <span
+            className="rounded-full px-2 py-0.5 text-xs font-medium"
+            style={{ background: "rgba(41,121,255,0.1)", color: "var(--accent-blue)" }}
+          >
+            Coach
+          </span>
+          <span className="rounded px-1.5 py-0.5 font-mono text-xs" style={{ background: "var(--bg-tertiary)", color: "var(--text-muted)" }}>
+            {formatTime(annotation.timestampSec)}
+          </span>
+        </div>
+        <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>{annotation.note}</p>
+      </div>
+    </div>
+  );
+}
+
 // ---- YouTube branch ----
 
 function YouTubePlayerSection({
@@ -114,7 +154,7 @@ function YouTubePlayerSection({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="relative w-full overflow-hidden rounded bg-zinc-700" style={{ aspectRatio: "16/9" }}>
+      <div className="relative w-full overflow-hidden rounded-lg" style={{ aspectRatio: "16/9", background: "var(--bg-tertiary)" }}>
         <iframe
           ref={iframeRef}
           src={embedSrc}
@@ -127,43 +167,17 @@ function YouTubePlayerSection({
       {annotations.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {annotations.map((a) => (
-            <button
-              key={a.id}
-              onClick={() => handleAnnotationClick(a)}
-              className={`rounded border px-2 py-1 text-xs ${
-                activeAnnotation?.id === a.id
-                  ? "border-indigo-600 bg-indigo-600 text-white"
-                  : "border-zinc-300 hover:border-zinc-500 dark:border-zinc-700 dark:hover:border-zinc-400"
-              }`}
-            >
+            <AnnotationPill key={a.id} active={activeAnnotation?.id === a.id} onClick={() => handleAnnotationClick(a)}>
               {formatTime(a.timestampSec)}
-            </button>
+            </AnnotationPill>
           ))}
         </div>
       )}
 
-      {activeAnnotation && (
-        <div className="flex items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
-            {initials(activeAnnotation.coach.name)}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{activeAnnotation.coach.name}</span>
-              <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300">
-                Coach
-              </span>
-              <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                {formatTime(activeAnnotation.timestampSec)}
-              </span>
-            </div>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{activeAnnotation.note}</p>
-          </div>
-        </div>
-      )}
+      {activeAnnotation && <ActiveAnnotationCard annotation={activeAnnotation} />}
 
       {canAnnotate && (
-        <div className="rounded border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="card-glass p-3">
           <YouTubeAnnotationForm
             submissionId={submissionId}
             playerRef={playerRef}
@@ -222,10 +236,7 @@ function YouTubeAnnotationForm({
 
   if (!open) {
     return (
-      <button
-        onClick={() => setOpen(true)}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
-      >
+      <button onClick={() => setOpen(true)} className="btn-glow-blue rounded-lg px-4 py-2 text-sm">
         Add annotation
       </button>
     );
@@ -233,40 +244,43 @@ function YouTubeAnnotationForm({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="text-sm" style={{ color: "var(--text-muted)" }}>
         Play the video to the moment you want to annotate, then tap &ldquo;Capture timestamp&rdquo;.
       </p>
       <div className="flex flex-wrap items-center gap-3">
         <button
           onClick={captureTime}
           disabled={!ytReady}
-          className="rounded border border-zinc-300 px-3 py-2 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          className="rounded-lg border px-3 py-2 text-sm hover:bg-white/5 disabled:opacity-50"
+          style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}
         >
           {ytReady ? "Capture timestamp" : "Loading player…"}
         </button>
         {capturedTime !== null && (
-          <span className="font-mono text-sm font-medium">{formatTime(capturedTime)}</span>
+          <span className="font-mono text-sm font-medium" style={{ color: "var(--text-primary)" }}>{formatTime(capturedTime)}</span>
         )}
       </div>
       <textarea
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="What should the athlete focus on?"
-        className="w-full rounded border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
+        className="w-full rounded-lg border px-3 py-2 text-sm"
+        style={{ borderColor: "var(--border-color)", background: "var(--bg-tertiary)", color: "var(--text-primary)" }}
         rows={3}
       />
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm" style={{ color: "var(--accent-red)" }}>{error}</p>}
       <div className="flex flex-wrap gap-2">
         <button
           onClick={save}
           disabled={saving || !note.trim() || capturedTime === null}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
+          className="btn-glow-blue rounded-lg px-4 py-2 text-sm disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save annotation"}
         </button>
         <button
           onClick={() => { setOpen(false); setCapturedTime(null); setNote(""); }}
-          className="rounded border border-zinc-300 px-4 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          className="rounded-lg border px-4 py-2 text-sm hover:bg-white/5"
+          style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}
         >
           Cancel
         </button>
@@ -437,7 +451,7 @@ export default function VideoAnnotator({
 
   return (
     <div className="flex flex-col gap-3">
-      <div ref={containerRef} className="relative w-full overflow-hidden rounded bg-zinc-700">
+      <div ref={containerRef} className="relative w-full overflow-hidden rounded-lg" style={{ background: "var(--bg-tertiary)" }}>
         <video
           ref={videoRef}
           src={videoUrl}
@@ -489,71 +503,44 @@ export default function VideoAnnotator({
       {annotations.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {annotations.map((a) => (
-            <button
-              key={a.id}
-              onClick={() => viewAnnotation(a)}
-              className={`rounded border px-2 py-1 text-xs ${
-                activeAnnotation?.id === a.id
-                  ? "border-indigo-600 bg-indigo-600 text-white"
-                  : "border-zinc-300 hover:border-zinc-500 dark:border-zinc-700 dark:hover:border-zinc-400"
-              }`}
-            >
+            <AnnotationPill key={a.id} active={activeAnnotation?.id === a.id} onClick={() => viewAnnotation(a)}>
               {formatTime(a.timestampSec)}
-            </button>
+            </AnnotationPill>
           ))}
         </div>
       )}
 
-      {activeAnnotation && (
-        <div className="flex items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
-            {initials(activeAnnotation.coach.name)}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{activeAnnotation.coach.name}</span>
-              <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300">
-                Coach
-              </span>
-              <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                {formatTime(activeAnnotation.timestampSec)}
-              </span>
-            </div>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{activeAnnotation.note}</p>
-          </div>
-        </div>
-      )}
+      {activeAnnotation && <ActiveAnnotationCard annotation={activeAnnotation} />}
 
       {canAnnotate && (
-        <div className="rounded border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="card-glass p-3">
           {!drawing ? (
             <button
               onClick={startNewAnnotation}
-              className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 sm:w-auto"
+              className="btn-glow-blue w-full rounded-lg px-4 py-2 text-sm sm:w-auto"
             >
               Add annotation at current frame
             </button>
           ) : (
             <div className="flex flex-col gap-3">
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="text-sm" style={{ color: "var(--text-muted)" }}>
                 Draw on the frame, add a note, then save. ({formatTime(videoRef.current?.currentTime ?? 0)})
               </p>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm">Color:</span>
+                <span className="text-sm" style={{ color: "var(--text-secondary)" }}>Color:</span>
                 {COLORS.map((c) => (
                   <button
                     key={c}
                     onClick={() => setColor(c)}
-                    className={`h-7 w-7 rounded-full border-2 ${
-                      color === c ? "border-zinc-900 dark:border-zinc-100" : "border-transparent"
-                    }`}
-                    style={{ backgroundColor: c }}
+                    className="h-7 w-7 rounded-full border-2"
+                    style={{ backgroundColor: c, borderColor: color === c ? "var(--accent-blue)" : "transparent" }}
                     aria-label={`Color ${c}`}
                   />
                 ))}
                 <button
                   onClick={clearCanvas}
-                  className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                  className="rounded-lg border px-2 py-1 text-xs hover:bg-white/5"
+                  style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}
                 >
                   Clear
                 </button>
@@ -562,21 +549,23 @@ export default function VideoAnnotator({
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="What should the athlete focus on?"
-                className="w-full rounded border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
+                className="w-full rounded-lg border px-3 py-2 text-sm"
+                style={{ borderColor: "var(--border-color)", background: "var(--bg-tertiary)", color: "var(--text-primary)" }}
                 rows={3}
               />
-              {error && <p className="text-sm text-red-600">{error}</p>}
+              {error && <p className="text-sm" style={{ color: "var(--accent-red)" }}>{error}</p>}
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={saveAnnotation}
                   disabled={saving || !note.trim()}
-                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
+                  className="btn-glow-blue rounded-lg px-4 py-2 text-sm disabled:opacity-50"
                 >
                   {saving ? "Saving…" : "Save annotation"}
                 </button>
                 <button
                   onClick={() => { setDrawing(false); clearCanvas(); }}
-                  className="rounded border border-zinc-300 px-4 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                  className="rounded-lg border px-4 py-2 text-sm hover:bg-white/5"
+                  style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}
                 >
                   Cancel
                 </button>

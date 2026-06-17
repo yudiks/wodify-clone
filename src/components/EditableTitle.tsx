@@ -37,7 +37,11 @@ export default function EditableTitle({
   }
 
   if (!canEdit) {
-    return <h1 className="text-2xl font-bold tracking-tight">{title}</h1>;
+    return (
+      <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-outfit)" }}>
+        {title}
+      </h1>
+    );
   }
 
   if (editing) {
@@ -53,7 +57,8 @@ export default function EditableTitle({
         }}
         autoFocus
         disabled={saving}
-        className="w-full border-b-2 border-zinc-900 bg-transparent text-2xl font-bold tracking-tight outline-none dark:border-zinc-100"
+        className="w-full bg-transparent text-2xl font-bold tracking-tight outline-none"
+        style={{ fontFamily: "var(--font-outfit)", borderBottom: "2px solid var(--accent-blue)" }}
       />
     );
   }
@@ -64,7 +69,9 @@ export default function EditableTitle({
       className="group flex items-center gap-2 text-left"
       title="Click to edit title"
     >
-      <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+      <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-outfit)" }}>
+        {title}
+      </h1>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="14"
@@ -75,7 +82,8 @@ export default function EditableTitle({
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="shrink-0 text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100"
+        className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+        style={{ color: "var(--text-muted)" }}
       >
         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />

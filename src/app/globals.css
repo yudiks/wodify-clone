@@ -1,26 +1,112 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #0b0c0f;
+  --bg-secondary: #13151a;
+  --bg-tertiary: #1c1f26;
+  --bg-card: rgba(28, 31, 38, 0.6);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(41, 121, 255, 0.4);
+
+  --accent-blue: #2979ff;
+  --accent-blue-hover: #5393ff;
+  --accent-green: #00e676;
+  --accent-green-bg: rgba(0, 230, 118, 0.1);
+  --accent-red: #ff3d00;
+  --accent-red-bg: rgba(255, 61, 0, 0.1);
+  --accent-yellow: #ffea00;
+  --accent-yellow-bg: rgba(255, 234, 0, 0.1);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --background: var(--bg-primary);
+  --foreground: var(--text-primary);
+
+  --radius-card: 16px;
+  --shadow-main: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-outfit);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Brand gradient — logo mark + gradient headline text */
+.brand-gradient {
+  background: linear-gradient(135deg, var(--accent-blue), #aa00ff);
+}
+
+.brand-gradient-text {
+  background: linear-gradient(to right, var(--accent-blue), #e040fb);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glassy dark card surface used throughout the app */
+.card-glass {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+}
+
+/* Primary action buttons with a colored glow shadow */
+.btn-glow-blue {
+  background: var(--accent-blue);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(41, 121, 255, 0.3);
+}
+.btn-glow-blue:hover {
+  background: var(--accent-blue-hover);
+}
+
+.btn-glow-green {
+  background: var(--accent-green);
+  color: #04210f;
+  box-shadow: 0 4px 12px rgba(0, 230, 118, 0.3);
+}
+.btn-glow-green:hover {
+  filter: brightness(1.08);
+}
+
+/* Pill status badge with a colored dot, e.g. Pending / Reviewed */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.status-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.status-pill.pending {
+  background: var(--accent-yellow-bg);
+  color: var(--accent-yellow);
+}
+.status-pill.pending::before {
+  background: var(--accent-yellow);
+}
+.status-pill.reviewed {
+  background: var(--accent-green-bg);
+  color: var(--accent-green);
+}
+.status-pill.reviewed::before {
+  background: var(--accent-green);
 }

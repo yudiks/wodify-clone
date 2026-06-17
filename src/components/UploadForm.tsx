@@ -236,45 +236,48 @@ export default function UploadForm() {
 
   const youtubeValid = mode === "youtube" && extractYouTubeId(youtubeUrl) !== null;
 
+  const fieldStyle = {
+    borderColor: "var(--border-color)",
+    background: "var(--bg-tertiary)",
+    color: "var(--text-primary)",
+  };
+
   return (
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+      className="card-glass flex flex-col gap-4 p-5"
     >
-      <h2 className="font-semibold">Upload a new video</h2>
+      <h2 className="font-semibold" style={{ fontFamily: "var(--font-outfit)" }}>
+        Upload a new video
+      </h2>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
         Title
         <input
           name="title"
           required
           placeholder="e.g. Heavy single snatch attempt"
-          className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
+          className="rounded-lg border px-3 py-2"
+          style={fieldStyle}
         />
       </label>
 
       {/* Mode toggle */}
-      <div className="flex gap-1 rounded border border-zinc-200 p-1 text-sm dark:border-zinc-700">
+      <div className="flex gap-1 rounded-lg border p-1 text-sm" style={{ borderColor: "var(--border-color)" }}>
         <button
           type="button"
           onClick={() => setMode("file")}
-          className={`flex-1 rounded px-3 py-1.5 transition-colors ${
-            mode === "file"
-              ? "bg-indigo-600 text-white"
-              : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-          }`}
+          className={`flex-1 rounded-md px-3 py-1.5 transition-colors ${mode === "file" ? "btn-glow-blue" : ""}`}
+          style={mode === "file" ? undefined : { color: "var(--text-secondary)" }}
         >
           Upload file
         </button>
         <button
           type="button"
           onClick={() => setMode("youtube")}
-          className={`flex-1 rounded px-3 py-1.5 transition-colors ${
-            mode === "youtube"
-              ? "bg-indigo-600 text-white"
-              : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-          }`}
+          className={`flex-1 rounded-md px-3 py-1.5 transition-colors ${mode === "youtube" ? "btn-glow-blue" : ""}`}
+          style={mode === "youtube" ? undefined : { color: "var(--text-secondary)" }}
         >
           YouTube link
         </button>
@@ -282,7 +285,7 @@ export default function UploadForm() {
 
       {mode === "file" ? (
         <>
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="flex flex-col gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
             Video file
             <input
               name="video"
@@ -290,33 +293,35 @@ export default function UploadForm() {
               accept="video/*"
               required
               onChange={handleFileChange}
-              className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+              className="rounded-lg border px-3 py-2"
+              style={fieldStyle}
             />
           </label>
 
           {/* Trim UI */}
           {videoObjectUrl && (
-            <div className="flex flex-col gap-2 rounded border border-zinc-200 p-3 dark:border-zinc-700">
+            <div className="flex flex-col gap-2 rounded-lg border p-3" style={{ borderColor: "var(--border-color)" }}>
               <video
                 ref={previewRef}
                 src={videoObjectUrl}
                 controls
                 onLoadedMetadata={handleMetadataLoaded}
-                className="max-h-48 w-full rounded bg-zinc-700 object-contain"
+                className="max-h-48 w-full rounded-lg object-contain"
+                style={{ background: "var(--bg-tertiary)" }}
               />
 
               {videoDuration > 0 && (
                 <>
-                  <div className="flex items-center justify-between text-xs text-zinc-500">
+                  <div className="flex items-center justify-between text-xs" style={{ color: "var(--text-muted)" }}>
                     <span>Trim</span>
                     <span>
                       {formatTime(trimStart)} → {formatTime(trimEnd)}{" "}
-                      <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                      <span className="font-medium" style={{ color: "var(--text-secondary)" }}>
                         ({formatTime(trimEnd - trimStart)})
                       </span>
                     </span>
                   </div>
-                  <label className="flex flex-col gap-1 text-xs text-zinc-500">
+                  <label className="flex flex-col gap-1 text-xs" style={{ color: "var(--text-muted)" }}>
                     Start
                     <input
                       type="range"
@@ -329,10 +334,11 @@ export default function UploadForm() {
                         setTrimStart(Math.min(v, trimEnd - 0.5));
                         if (previewRef.current) previewRef.current.currentTime = v;
                       }}
-                      className="w-full accent-zinc-900 dark:accent-zinc-100"
+                      className="w-full"
+                      style={{ accentColor: "var(--accent-blue)" }}
                     />
                   </label>
-                  <label className="flex flex-col gap-1 text-xs text-zinc-500">
+                  <label className="flex flex-col gap-1 text-xs" style={{ color: "var(--text-muted)" }}>
                     End
                     <input
                       type="range"
@@ -345,11 +351,12 @@ export default function UploadForm() {
                         setTrimEnd(Math.max(v, trimStart + 0.5));
                         if (previewRef.current) previewRef.current.currentTime = v;
                       }}
-                      className="w-full accent-zinc-900 dark:accent-zinc-100"
+                      className="w-full"
+                      style={{ accentColor: "var(--accent-blue)" }}
                     />
                   </label>
                   {isTrimmed && (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                       Trimming re-plays the clip in real-time ({formatTime(trimEnd - trimStart)}).
                     </p>
                   )}
@@ -357,10 +364,10 @@ export default function UploadForm() {
               )}
 
               {trimProgress !== null && (
-                <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+                <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: "var(--bg-tertiary)" }}>
                   <div
-                    className="h-full rounded-full bg-zinc-900 transition-all dark:bg-zinc-100"
-                    style={{ width: `${Math.round(trimProgress * 100)}%` }}
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${Math.round(trimProgress * 100)}%`, background: "var(--accent-blue)" }}
                   />
                 </div>
               )}
@@ -368,7 +375,7 @@ export default function UploadForm() {
           )}
         </>
       ) : (
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
           YouTube URL
           <input
             type="url"
@@ -376,22 +383,23 @@ export default function UploadForm() {
             onChange={(e) => setYoutubeUrl(e.target.value)}
             placeholder="https://www.youtube.com/watch?v=…"
             required
-            className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
+            className="rounded-lg border px-3 py-2"
+            style={fieldStyle}
           />
           {youtubeUrl && !youtubeValid && (
-            <span className="text-xs text-red-500">Paste a youtube.com or youtu.be link</span>
+            <span className="text-xs" style={{ color: "var(--accent-red)" }}>Paste a youtube.com or youtu.be link</span>
           )}
           {youtubeValid && (
-            <span className="text-xs text-green-600 dark:text-green-400">✓ Valid YouTube link</span>
+            <span className="text-xs" style={{ color: "var(--accent-green)" }}>✓ Valid YouTube link</span>
           )}
         </label>
       )}
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-sm" style={{ color: "var(--accent-red)" }}>{error}</p>}
       <button
         type="submit"
         disabled={loading || (mode === "youtube" && !youtubeValid)}
-        className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50 sm:w-auto"
+        className="btn-glow-blue w-full rounded-lg px-4 py-2 text-sm disabled:opacity-50 sm:w-auto"
       >
         {loading ? (progress ?? "Saving…") : mode === "youtube" ? "Add video" : "Upload"}
       </button>

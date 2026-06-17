@@ -22,17 +22,17 @@ export default async function CoachPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-8">
       <div>
-        <h1 className="text-2xl font-bold">Coach Inbox</h1>
-        <p className="text-sm text-zinc-500">
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-outfit)" }}>Coach Inbox</h1>
+        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
           Review athlete submissions and leave annotated feedback.
         </p>
       </div>
       <section className="flex flex-col gap-3">
-        <h2 className="font-semibold">Pending review ({pending.length})</h2>
+        <h2 className="font-semibold" style={{ color: "var(--text-primary)" }}>Pending review ({pending.length})</h2>
         <SubmissionList submissions={pending} showAthlete />
       </section>
       <section className="flex flex-col gap-3">
-        <h2 className="font-semibold">Reviewed ({reviewed.length})</h2>
+        <h2 className="font-semibold" style={{ color: "var(--text-primary)" }}>Reviewed ({reviewed.length})</h2>
         <SubmissionList submissions={reviewed} showAthlete />
       </section>
     </div>

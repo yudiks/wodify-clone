@@ -60,58 +60,65 @@ function LoginForm() {
 
   return (
     <div className="mx-auto max-w-sm px-4 py-16">
-      <h1 className="mb-6 text-2xl font-bold">Log in</h1>
+      <div className="card-glass p-6">
+        <h1 className="mb-6 text-2xl font-bold" style={{ fontFamily: "var(--font-outfit)" }}>
+          Log in
+        </h1>
 
-      <button
-        onClick={() => signIn("google", { callbackUrl: "/" })}
-        className="mb-4 flex w-full items-center justify-center gap-3 rounded border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
-      >
-        <GoogleIcon />
-        Sign in with Google
-      </button>
-
-      <div className="relative mb-4 flex items-center gap-3">
-        <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
-        <span className="text-xs text-zinc-400">or</span>
-        <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm">
-          Email
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          Password
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-          />
-        </label>
-        {error && <p className="text-sm text-red-600">{error}</p>}
         <button
-          type="submit"
-          disabled={loading}
-          className="rounded bg-zinc-900 px-4 py-2 text-white hover:bg-zinc-700 disabled:opacity-50"
+          onClick={() => signIn("google", { callbackUrl: "/" })}
+          className="mb-4 flex w-full items-center justify-center gap-3 rounded-lg border px-4 py-2 text-sm font-medium hover:bg-white/5"
+          style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}
         >
-          {loading ? "Logging in..." : "Log in"}
+          <GoogleIcon />
+          Sign in with Google
         </button>
-      </form>
-      <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
-        Don&apos;t have an account?{" "}
-        <Link href="/register" className="underline">
-          Sign up
-        </Link>
-      </p>
+
+        <div className="relative mb-4 flex items-center gap-3">
+          <div className="h-px flex-1" style={{ background: "var(--border-color)" }} />
+          <span className="text-xs" style={{ color: "var(--text-muted)" }}>or</span>
+          <div className="h-px flex-1" style={{ background: "var(--border-color)" }} />
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <label className="flex flex-col gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
+            Email
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="rounded-lg border px-3 py-2"
+              style={{ borderColor: "var(--border-color)", background: "var(--bg-tertiary)", color: "var(--text-primary)" }}
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
+            Password
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="rounded-lg border px-3 py-2"
+              style={{ borderColor: "var(--border-color)", background: "var(--bg-tertiary)", color: "var(--text-primary)" }}
+            />
+          </label>
+          {error && <p className="text-sm" style={{ color: "var(--accent-red)" }}>{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-glow-blue rounded-lg px-4 py-2 font-medium disabled:opacity-50"
+          >
+            {loading ? "Logging in..." : "Log in"}
+          </button>
+        </form>
+        <p className="mt-4 text-sm" style={{ color: "var(--text-secondary)" }}>
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="underline" style={{ color: "var(--accent-blue)" }}>
+            Sign up
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

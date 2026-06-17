@@ -51,76 +51,83 @@ export default function RegisterPage() {
 
   return (
     <div className="mx-auto max-w-sm px-4 py-16">
-      <h1 className="mb-6 text-2xl font-bold">Sign up</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm">
-          Name
-          <input
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          Email
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          Password (min 8 characters)
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-          />
-        </label>
-        <fieldset className="flex flex-col gap-1 text-sm">
-          <span>I am a...</span>
-          <div className="flex gap-4">
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="role"
-                checked={role === "ATHLETE"}
-                onChange={() => setRole("ATHLETE")}
-              />
-              Athlete
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="role"
-                checked={role === "COACH"}
-                onChange={() => setRole("COACH")}
-              />
-              Coach
-            </label>
-          </div>
-        </fieldset>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded bg-zinc-900 px-4 py-2 text-white hover:bg-zinc-700 disabled:opacity-50"
-        >
-          {loading ? "Creating account..." : "Sign up"}
-        </button>
-      </form>
-      <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
-        Already have an account?{" "}
-        <Link href="/login" className="underline">
-          Log in
-        </Link>
-      </p>
+      <div className="card-glass p-6">
+        <h1 className="mb-6 text-2xl font-bold" style={{ fontFamily: "var(--font-outfit)" }}>
+          Sign up
+        </h1>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <label className="flex flex-col gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
+            Name
+            <input
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="rounded-lg border px-3 py-2"
+              style={{ borderColor: "var(--border-color)", background: "var(--bg-tertiary)", color: "var(--text-primary)" }}
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
+            Email
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="rounded-lg border px-3 py-2"
+              style={{ borderColor: "var(--border-color)", background: "var(--bg-tertiary)", color: "var(--text-primary)" }}
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
+            Password (min 8 characters)
+            <input
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="rounded-lg border px-3 py-2"
+              style={{ borderColor: "var(--border-color)", background: "var(--bg-tertiary)", color: "var(--text-primary)" }}
+            />
+          </label>
+          <fieldset className="flex flex-col gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
+            <span>I am a...</span>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="role"
+                  checked={role === "ATHLETE"}
+                  onChange={() => setRole("ATHLETE")}
+                />
+                Athlete
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="role"
+                  checked={role === "COACH"}
+                  onChange={() => setRole("COACH")}
+                />
+                Coach
+              </label>
+            </div>
+          </fieldset>
+          {error && <p className="text-sm" style={{ color: "var(--accent-red)" }}>{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-glow-blue rounded-lg px-4 py-2 font-medium disabled:opacity-50"
+          >
+            {loading ? "Creating account..." : "Sign up"}
+          </button>
+        </form>
+        <p className="mt-4 text-sm" style={{ color: "var(--text-secondary)" }}>
+          Already have an account?{" "}
+          <Link href="/login" className="underline" style={{ color: "var(--accent-blue)" }}>
+            Log in
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

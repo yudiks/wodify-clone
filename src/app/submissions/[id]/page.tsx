@@ -50,7 +50,7 @@ export default async function SubmissionPage({
             title={submission.title}
             canEdit={isOwner}
           />
-          <p className="mt-0.5 text-sm text-zinc-500">
+          <p className="mt-0.5 text-sm" style={{ color: "var(--text-muted)" }}>
             {submission.athlete.name} · {new Date(submission.createdAt).toLocaleString()}
           </p>
         </div>
