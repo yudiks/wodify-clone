@@ -261,19 +261,25 @@ export default function VideoAnnotator({
   const isDrawingRef = useRef(false);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
+  // Sync canvas pixel buffer to its CSS rendered size whenever it changes.
+  // ResizeObserver is more reliable than window resize or video metadata events
+  // because it fires after layout, including on initial mount and orientation changes.
   useEffect(() => {
-    function resize() {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      if (!video || !canvas) return;
-      const rect = video.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    function sync() {
+      if (!canvas) return;
+      const { width, height } = canvas.getBoundingClientRect();
+      if (canvas.width !== Math.round(width) || canvas.height !== Math.round(height)) {
+        canvas.width = Math.round(width);
+        canvas.height = Math.round(height);
+      }
     }
-    resize();
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, [videoRef]);
+    const observer = new ResizeObserver(sync);
+    observer.observe(canvas);
+    sync();
+    return () => observer.disconnect();
+  }, []);
 
   function getCanvasPoint(e: React.PointerEvent<HTMLCanvasElement>) {
     const canvas = canvasRef.current;
@@ -284,12 +290,14 @@ export default function VideoAnnotator({
 
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
     if (!isCoach || !drawing) return;
+    e.preventDefault();
     isDrawingRef.current = true;
     lastPointRef.current = getCanvasPoint(e);
   }
 
   function handlePointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
     if (!isCoach || !drawing || !isDrawingRef.current) return;
+    e.preventDefault();
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
@@ -389,20 +397,13 @@ export default function VideoAnnotator({
           ref={videoRef}
           src={videoUrl}
           controls
+          playsInline
           className="max-h-72 w-full object-contain"
           onPlay={() => {
             if (activeAnnotation) {
               setActiveAnnotation(null);
               clearCanvas();
             }
-          }}
-          onLoadedMetadata={() => {
-            const video = videoRef.current;
-            const canvas = canvasRef.current;
-            if (!video || !canvas) return;
-            const rect = video.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
           }}
         />
         {activeAnnotation && (
@@ -418,6 +419,7 @@ export default function VideoAnnotator({
           className={`absolute left-0 top-0 h-full w-full ${
             drawing ? "cursor-crosshair" : "pointer-events-none"
           }`}
+          style={{ touchAction: "none" }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
