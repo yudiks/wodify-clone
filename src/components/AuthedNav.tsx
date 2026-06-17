@@ -23,7 +23,10 @@ export default function AuthedNav({
 
   const links =
     role === "ATHLETE"
-      ? [{ href: "/dashboard", label: "My Submissions" }]
+      ? [
+          { href: "/dashboard", label: "Dashboard" },
+          { href: "/upload", label: "Upload" },
+        ]
       : [{ href: "/coach", label: "Coach Inbox" }];
 
   const sidebarContent = (
@@ -43,16 +46,19 @@ export default function AuthedNav({
         </button>
       </div>
       <nav className="flex flex-1 flex-col gap-1">
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/5"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {link.label}
-          </Link>
-        ))}
+        {links.map((link) => {
+          const active = pathname === link.href;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/5"
+              style={active ? { background: "rgba(41,121,255,0.12)", color: "var(--accent-blue)" } : { color: "var(--text-secondary)" }}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
       </nav>
       <div className="flex items-center justify-between border-t pt-4" style={{ borderColor: "var(--border-color)" }}>
         <span className="truncate text-xs" style={{ color: "var(--text-muted)" }}>

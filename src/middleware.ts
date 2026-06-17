@@ -15,9 +15,13 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
+  if (pathname.startsWith("/upload") && req.auth.user.role !== "ATHLETE") {
+    return NextResponse.redirect(new URL("/coach", req.url));
+  }
+
   return NextResponse.next();
 });
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/coach/:path*", "/submissions/:path*"],
+  matcher: ["/dashboard/:path*", "/coach/:path*", "/submissions/:path*", "/upload/:path*"],
 };

@@ -224,6 +224,7 @@ export default function UploadForm() {
       setYoutubeUrl("");
       setVideoObjectUrl(null);
       setVideoDuration(0);
+      router.push("/dashboard");
       router.refresh();
     } catch (err) {
       setError((err as Error).message ?? "Upload failed");

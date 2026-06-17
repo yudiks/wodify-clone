@@ -175,9 +175,14 @@ export default function VideoGrid({
             <h3 style={{ fontFamily: "var(--font-outfit)" }}>No videos found</h3>
             <p>
               {role === "ATHLETE"
-                ? "Upload your first lift video above to get coach feedback."
+                ? "Upload your first lift video to get coach feedback."
                 : "All caught up! No athlete videos match this filter."}
             </p>
+            {role === "ATHLETE" && (
+              <Link href="/upload" className="btn-glow-blue mt-2 rounded-lg px-4 py-2 text-sm font-medium">
+                Upload a video
+              </Link>
+            )}
           </div>
         ) : (
           <div className="video-grid">
