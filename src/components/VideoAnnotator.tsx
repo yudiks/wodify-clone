@@ -88,7 +88,14 @@ function YouTubePlayerSection({
         (a) => t >= a.timestampSec && t <= a.timestampSec + 3,
       );
       const match = candidates[candidates.length - 1] ?? null;
-      setActiveAnnotation((prev) => (prev?.id === match?.id ? prev : match));
+      setActiveAnnotation((prev) => {
+        if (prev?.id === match?.id) return prev;
+        if (match) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (playerRef.current as any)?.pauseVideo?.();
+        }
+        return match;
+      });
     }, 250);
     return () => clearInterval(id);
   }, [ytReady, annotations]);
@@ -443,12 +450,19 @@ export default function VideoAnnotator({
           }}
           onTimeUpdate={() => {
             if (drawing) return;
-            const t = videoRef.current?.currentTime ?? 0;
+            const video = videoRef.current;
+            const t = video?.currentTime ?? 0;
             const candidates = annotations.filter(
               (a) => t >= a.timestampSec && t <= a.timestampSec + 3,
             );
             const match = candidates[candidates.length - 1] ?? null;
-            setActiveAnnotation((prev) => (prev?.id === match?.id ? prev : match));
+            setActiveAnnotation((prev) => {
+              if (prev?.id === match?.id) return prev;
+              if (match && video && !video.paused) {
+                video.pause();
+              }
+              return match;
+            });
           }}
         />
         {activeAnnotation && activeAnnotation.drawingDataUrl && (
