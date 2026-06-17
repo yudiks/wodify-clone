@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import SubmissionReview from "@/components/SubmissionReview";
+import ShareLink from "@/components/ShareLink";
 
 export default async function SubmissionPage({
   params,
@@ -36,12 +37,15 @@ export default async function SubmissionPage({
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-8">
-      <div>
-        <h1 className="text-2xl font-bold">{submission.title}</h1>
-        <p className="text-sm text-zinc-500">
-          {submission.movementType} · {submission.athlete.name} ·{" "}
-          {new Date(submission.createdAt).toLocaleString()}
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">{submission.title}</h1>
+          <p className="text-sm text-zinc-500">
+            {submission.movementType} · {submission.athlete.name} ·{" "}
+            {new Date(submission.createdAt).toLocaleString()}
+          </p>
+        </div>
+        <ShareLink submissionId={submission.id} />
       </div>
       <SubmissionReview
         submissionId={submission.id}

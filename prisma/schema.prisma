@@ -38,6 +38,7 @@ model Submission {
   movementType String
   videoUrl     String
   status       SubmissionStatus @default(PENDING)
+  shareToken   String?          @unique
   createdAt    DateTime         @default(now())
 
   annotations Annotation[]
