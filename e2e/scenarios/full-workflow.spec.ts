@@ -6,10 +6,7 @@
  *   4. Athlete replies with a follow-up comment
  *   5. Coach reads the athlete's reply
  */
-import { test, expect, ATHLETE, COACH, BLANK_PNG, loginAs } from "../fixtures/auth";
-import path from "path";
-
-const sampleVideo = path.resolve(__dirname, "../../public/sample.mp4");
+import { test, expect, ATHLETE, COACH, BLANK_PNG, loginAs, uploadVideo } from "../fixtures/auth";
 
 async function postAnnotationViaApi(
   page: import("@playwright/test").Page,
@@ -36,15 +33,7 @@ test("full athlete → coach → athlete workflow", async ({ page }) => {
 
   // ── Step 1: Athlete uploads a video ──────────────────────────────────────
   await loginAs(page, ATHLETE);
-  await page.fill('input[name="title"]', title);
-  await page.fill('input[name="movementType"]', "Snatch");
-  await page.setInputFiles('input[type="file"]', sampleVideo);
-  await page.click('button:has-text("Upload")');
-  await expect(page.getByText(title)).toBeVisible({ timeout: 20_000 });
-
-  // Capture submission ID from the card link
-  const href = await page.locator(`a:has-text("${title}")`).getAttribute("href");
-  const submissionId = href!.split("/submissions/")[1];
+  const submissionId = await uploadVideo(page, title);
 
   // Submission is pending for the athlete
   const athleteCard = page.locator(`a:has-text("${title}")`);
@@ -53,12 +42,11 @@ test("full athlete → coach → athlete workflow", async ({ page }) => {
   // ── Step 2: Coach adds two annotations and a comment ─────────────────────
   await loginAs(page, COACH);
 
-  // Submission appears in Pending section of coach inbox
-  const pendingSection = page
-    .locator("section")
-    .filter({ has: page.getByRole("heading", { name: /Pending review/ }) });
-  await expect(pendingSection.getByText(title)).toBeVisible();
-  await expect(pendingSection.locator("a").filter({ hasText: title }).getByText(ATHLETE.name)).toBeVisible();
+  // Submission appears in coach inbox, marked Pending
+  const coachCard = page.locator(".video-card").filter({ hasText: title });
+  await expect(coachCard).toBeVisible();
+  await expect(coachCard.getByText(ATHLETE.name)).toBeVisible();
+  await expect(coachCard.locator(".status-pill.pending")).toBeVisible();
 
   // Open the submission
   await page.click(`a:has-text("${title}")`);
@@ -81,14 +69,12 @@ test("full athlete → coach → athlete workflow", async ({ page }) => {
   const coachComment = page.locator("li").filter({ hasText: "Overall a solid lift" });
   await expect(coachComment).toBeVisible({ timeout: 10_000 });
   await expect(coachComment.getByText(COACH.name, { exact: true })).toBeVisible();
-  await expect(coachComment.getByText("· COACH")).toBeVisible();
+  await expect(coachComment.getByText("Coach", { exact: true })).toBeVisible();
 
-  // Submission now appears under Reviewed in coach inbox
+  // Submission now shows Reviewed in coach inbox
   await page.goto("/coach");
-  const reviewedSection = page
-    .locator("section")
-    .filter({ has: page.getByRole("heading", { name: /Reviewed/ }) });
-  await expect(reviewedSection.getByText(title)).toBeVisible();
+  const reviewedCard = page.locator(".video-card").filter({ hasText: title });
+  await expect(reviewedCard.locator(".status-pill.reviewed")).toBeVisible();
 
   // ── Step 3: Athlete sees submission is Reviewed ───────────────────────────
   await loginAs(page, ATHLETE);
@@ -97,8 +83,9 @@ test("full athlete → coach → athlete workflow", async ({ page }) => {
   const updatedCard = page.locator(`a:has-text("${title}")`);
   await expect(updatedCard.getByText("2 annotations")).toBeVisible();
   await expect(updatedCard.getByText("1 comment")).toBeVisible();
-  // Status badge should now be Reviewed (green-ish), not Pending (amber)
-  await expect(updatedCard.locator(".bg-amber-100, .bg-amber-900\\/40")).not.toBeVisible();
+  // Status badge should now be Reviewed, not Pending
+  await expect(updatedCard.locator(".status-pill.pending")).not.toBeVisible();
+  await expect(updatedCard.locator(".status-pill.reviewed")).toBeVisible();
 
   // Open the submission detail
   await page.click(`a:has-text("${title}")`);
@@ -141,10 +128,10 @@ test("full athlete → coach → athlete workflow", async ({ page }) => {
     thread.filter({ hasText: "Thanks coach! I'll focus on elbow speed" })
   ).toBeVisible();
 
-  // Athlete reply has ATHLETE name and no COACH badge
+  // Athlete reply has ATHLETE name and no Coach badge
   const athleteReplyCoachView = thread.filter({
     hasText: "Thanks coach! I'll focus on elbow speed",
   });
   await expect(athleteReplyCoachView.getByText(ATHLETE.name, { exact: true })).toBeVisible();
-  await expect(athleteReplyCoachView.getByText("· COACH")).not.toBeVisible();
+  await expect(athleteReplyCoachView.getByText("Coach", { exact: true })).not.toBeVisible();
 });

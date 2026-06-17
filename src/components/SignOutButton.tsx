@@ -7,6 +7,7 @@ export default function SignOutButton() {
     <button
       onClick={() => signOut({ callbackUrl: "/" })}
       title="Sign out"
+      aria-label="Sign out"
       className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-white/5"
       style={{ color: "var(--text-muted)" }}
     >

@@ -1,20 +1,10 @@
-import { test, expect, ATHLETE, COACH, BLANK_PNG, loginAs } from "../fixtures/auth";
-import path from "path";
-
-const sampleVideo = path.resolve(__dirname, "../../public/sample.mp4");
+import { test, expect, ATHLETE, COACH, BLANK_PNG, loginAs, uploadVideo } from "../fixtures/auth";
 
 async function createSubmission(
   page: import("@playwright/test").Page,
   title: string
 ): Promise<string> {
-  await page.goto("/dashboard");
-  await page.fill('input[name="title"]', title);
-  await page.fill('input[name="movementType"]', "Snatch");
-  await page.setInputFiles('input[type="file"]', sampleVideo);
-  await page.click('button:has-text("Upload")');
-  await expect(page.getByText(title)).toBeVisible({ timeout: 20000 });
-  const href = await page.locator(`a:has-text("${title}")`).getAttribute("href");
-  return href!.split("/submissions/")[1];
+  return uploadVideo(page, title);
 }
 
 async function postAnnotationViaApi(
@@ -46,12 +36,12 @@ test.describe("Coach review flow", () => {
     await createSubmission(page, title);
 
     await loginAs(page, COACH);
-    await expect(page.getByRole("heading", { name: /Pending review/ })).toBeVisible();
+    await expect(page.getByText("Coaching Lift Queue")).toBeVisible();
     await expect(page.getByText(title)).toBeVisible();
+    const card = page.locator(".video-card").filter({ hasText: title });
     // Athlete name shown in coach view
-    await expect(
-      page.locator("a").filter({ hasText: title }).getByText(ATHLETE.name)
-    ).toBeVisible();
+    await expect(card.getByText(ATHLETE.name)).toBeVisible();
+    await expect(card.locator(".status-pill.pending")).toBeVisible();
   });
 
   test("coach can open a submission and sees video + annotation controls", async ({
@@ -85,10 +75,8 @@ test.describe("Coach review flow", () => {
 
     // Submission moves from pending → reviewed on coach inbox
     await page.goto("/coach");
-    const reviewedSection = page.locator("section").filter({
-      has: page.getByText(/Reviewed/),
-    }).last();
-    await expect(reviewedSection.getByText(title)).toBeVisible();
+    const card = page.locator(".video-card").filter({ hasText: title });
+    await expect(card.locator(".status-pill.reviewed")).toBeVisible();
   });
 
   test("coach can post a comment on a submission", async ({ page }) => {
@@ -111,8 +99,8 @@ test.describe("Coach review flow", () => {
       .filter({ hasText: "Great depth — watch the bar path on the way down." });
     await expect(commentItem).toBeVisible({ timeout: 10000 });
     await expect(commentItem.getByText(COACH.name, { exact: true })).toBeVisible();
-    // Role badge is rendered as "· COACH"
-    await expect(commentItem.getByText("· COACH")).toBeVisible();
+    // Role badge pill
+    await expect(commentItem.getByText("Coach", { exact: true })).toBeVisible();
   });
 
   test("annotation note is displayed with coach name and timestamp", async ({
@@ -140,7 +128,7 @@ test.describe("Coach review flow", () => {
     await expect(annotationCard.getByText(COACH.name, { exact: false })).toBeVisible();
   });
 
-  test("reviewed submissions appear in the Reviewed section of coach inbox", async ({
+  test("reviewed submissions appear on the coach inbox marked as Reviewed", async ({
     page,
   }) => {
     await loginAs(page, ATHLETE);
@@ -152,9 +140,7 @@ test.describe("Coach review flow", () => {
     await postAnnotationViaApi(page, id, "Good lift.");
 
     await page.goto("/coach");
-    const reviewedSection = page
-      .locator("section")
-      .filter({ has: page.getByRole("heading", { name: /Reviewed/ }) });
-    await expect(reviewedSection.getByText(title)).toBeVisible();
+    const card = page.locator(".video-card").filter({ hasText: title });
+    await expect(card.locator(".status-pill.reviewed")).toBeVisible();
   });
 });

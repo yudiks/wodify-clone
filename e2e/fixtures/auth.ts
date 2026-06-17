@@ -1,6 +1,9 @@
 import { test as base, expect, type Page } from "@playwright/test";
+import path from "path";
 
 export { expect } from "@playwright/test";
+
+export const SAMPLE_VIDEO = path.resolve(__dirname, "../../public/sample.mp4");
 
 // Custom test that intercepts Vercel Blob CDN uploads in CI so tests don't
 // require real network access to vercel.com/api/blob.
@@ -58,9 +61,25 @@ export async function loginAs(
 }
 
 export async function logout(page: Page) {
-  await page.click('button:has-text("Sign out")');
+  await page.getByRole("button", { name: "Sign out" }).click();
   // signOut({ callbackUrl: "/" }) lands on /, not /login
   await page.waitForURL("/");
+}
+
+/**
+ * Uploads a video from the /upload page and waits for the redirect back to
+ * /dashboard, where the new submission shows up in the list. Returns the
+ * submission id parsed from the card's link.
+ */
+export async function uploadVideo(page: Page, title: string): Promise<string> {
+  await page.goto("/upload");
+  await page.fill('input[name="title"]', title);
+  await page.setInputFiles('input[type="file"]', SAMPLE_VIDEO);
+  await page.click('button:has-text("Upload")');
+  await page.waitForURL(/\/dashboard/);
+  await expect(page.getByText(title)).toBeVisible({ timeout: 20000 });
+  const href = await page.locator(`a:has-text("${title}")`).getAttribute("href");
+  return href!.split("/submissions/")[1];
 }
 
 /** Minimal 1×1 transparent PNG as a data URL for annotation drawing tests. */

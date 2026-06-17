@@ -1,58 +1,38 @@
-import { test, expect, ATHLETE, loginAs } from "../fixtures/auth";
-import path from "path";
-
-const sampleVideo = path.resolve(__dirname, "../../public/sample.mp4");
+import { test, expect, ATHLETE, loginAs, uploadVideo } from "../fixtures/auth";
 
 test.describe("Athlete submission flow", () => {
   test.beforeEach(async ({ page }) => {
     await loginAs(page, ATHLETE);
   });
 
-  test("dashboard shows upload form and empty submissions list initially", async ({
-    page,
-  }) => {
+  test("dashboard shows an empty submissions list initially", async ({ page }) => {
+    await expect(page.getByText("No videos found")).toBeVisible();
+  });
+
+  test("upload page shows the upload form", async ({ page }) => {
+    await page.goto("/upload");
     await expect(page.getByText("Upload a new video")).toBeVisible();
-    // Empty state shows after DB reset
-    await expect(page.getByText("No submissions yet.")).toBeVisible();
   });
 
   test("athlete can upload a video submission", async ({ page }) => {
-    await page.fill('input[name="title"]', "Snatch — heavy single");
-    await page.fill('input[name="movementType"]', "Snatch");
-    await page.setInputFiles('input[type="file"]', sampleVideo);
-    await page.click('button:has-text("Upload")');
+    await uploadVideo(page, "Snatch — heavy single");
 
-    await expect(page.getByText("Snatch — heavy single")).toBeVisible({
-      timeout: 20000,
-    });
+    await expect(page.getByText("Snatch — heavy single")).toBeVisible();
     // Pending badge
-    await expect(page.locator(".bg-amber-100, .bg-amber-900\\/40").first()).toBeVisible();
+    await expect(page.locator(".status-pill.pending").first()).toBeVisible();
   });
 
   test("submission appears in list with correct metadata", async ({ page }) => {
     const title = `Clean & Jerk ${Date.now()}`;
-    await page.fill('input[name="title"]', title);
-    await page.fill('input[name="movementType"]', "Clean & Jerk");
-    await page.setInputFiles('input[type="file"]', sampleVideo);
-    await page.click('button:has-text("Upload")');
-
-    await expect(page.getByText(title)).toBeVisible({ timeout: 20000 });
+    await uploadVideo(page, title);
 
     const card = page.locator(`a:has-text("${title}")`);
-    // The subtitle p has movement · date — match the subtitle specifically
-    await expect(card.locator("p.text-sm").filter({ hasText: "Clean & Jerk" })).toBeVisible();
     await expect(card.getByText("0 annotations")).toBeVisible();
     await expect(card.getByText("0 comments")).toBeVisible();
   });
 
   test("athlete can view a submission detail page", async ({ page }) => {
-    await page.fill('input[name="title"]', "Front Squat Detail Test");
-    await page.fill('input[name="movementType"]', "Front Squat");
-    await page.setInputFiles('input[type="file"]', sampleVideo);
-    await page.click('button:has-text("Upload")');
-    await expect(page.getByText("Front Squat Detail Test")).toBeVisible({
-      timeout: 20000,
-    });
+    await uploadVideo(page, "Front Squat Detail Test");
 
     await page.click('a:has-text("Front Squat Detail Test")');
     await expect(page).toHaveURL(/\/submissions\//);
@@ -69,13 +49,7 @@ test.describe("Athlete submission flow", () => {
   test("athlete can post a comment on their own submission", async ({
     page,
   }) => {
-    await page.fill('input[name="title"]', "Deadlift Comment Test");
-    await page.fill('input[name="movementType"]', "Deadlift");
-    await page.setInputFiles('input[type="file"]', sampleVideo);
-    await page.click('button:has-text("Upload")');
-    await expect(page.getByText("Deadlift Comment Test")).toBeVisible({
-      timeout: 20000,
-    });
+    await uploadVideo(page, "Deadlift Comment Test");
 
     await page.click('a:has-text("Deadlift Comment Test")');
     await expect(page).toHaveURL(/\/submissions\//);

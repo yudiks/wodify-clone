@@ -1,4 +1,4 @@
-import { test, expect, ATHLETE, COACH, BLANK_PNG, loginAs } from "../fixtures/auth";
+import { test, expect, ATHLETE, COACH, loginAs } from "../fixtures/auth";
 
 test.describe("Role-based access control", () => {
   test("athlete is redirected away from /coach", async ({ page }) => {
@@ -29,11 +29,10 @@ test.describe("Role-based access control", () => {
     await expect(page).toHaveURL(/\/coach/);
   });
 
-  test("athlete cannot POST an annotation (API-level enforcement)", async ({
+  test("POSTing an annotation to a nonexistent submission returns 404", async ({
     page,
   }) => {
     await loginAs(page, ATHLETE);
-    // Use page.evaluate to make a fetch with the session cookie already present
     const status = await page.evaluate(async () => {
       const res = await fetch("/api/submissions/fake-id/annotations", {
         method: "POST",
@@ -46,6 +45,49 @@ test.describe("Role-based access control", () => {
       });
       return res.status;
     });
+    expect(status).toBe(404);
+  });
+
+  test("athlete cannot POST an annotation on another athlete's submission (API-level enforcement)", async ({
+    page,
+  }) => {
+    // Athlete A creates a submission.
+    await loginAs(page, ATHLETE);
+    const submissionId = await page.evaluate(async () => {
+      const res = await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "Athlete A's video",
+          videoUrl: "https://example.com/video.mp4",
+        }),
+      });
+      const data = await res.json();
+      return data.id as string;
+    });
+
+    // Athlete B registers and tries to annotate athlete A's submission.
+    const email = `athlete-b-${Date.now()}@example.com`;
+    await page.request.post("/api/register", {
+      data: { name: "Athlete B", email, password: "password123", role: "ATHLETE" },
+    });
+    await loginAs(page, { email, password: "password123" });
+
+    const status = await page.evaluate(
+      async (submissionId) => {
+        const res = await fetch(`/api/submissions/${submissionId}/annotations`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            timestampSec: 0,
+            drawingDataUrl: "data:image/png;base64,abc",
+            note: "sneaky",
+          }),
+        });
+        return res.status;
+      },
+      submissionId
+    );
     expect(status).toBe(403);
   });
 

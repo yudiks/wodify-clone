@@ -4,7 +4,7 @@ test.describe("Authentication", () => {
   test("redirects unauthenticated users from protected pages to /login", async ({
     page,
   }) => {
-    for (const path of ["/dashboard", "/coach", "/submissions/nonexistent"]) {
+    for (const path of ["/dashboard", "/coach", "/upload", "/submissions/nonexistent"]) {
       await page.goto(path);
       await expect(page).toHaveURL(/\/login/);
     }
@@ -13,13 +13,15 @@ test.describe("Authentication", () => {
   test("athlete can log in and lands on /dashboard", async ({ page }) => {
     await loginAs(page, ATHLETE);
     await expect(page).toHaveURL(/\/dashboard/);
-    await expect(page.getByRole("heading", { name: "My Submissions" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+    await expect(page.getByText("My Video Submissions")).toBeVisible();
   });
 
   test("coach can log in and lands on /coach", async ({ page }) => {
     await loginAs(page, COACH);
     await expect(page).toHaveURL(/\/coach/);
-    await expect(page.getByRole("heading", { name: "Coach Inbox" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+    await expect(page.getByText("Coaching Lift Queue")).toBeVisible();
   });
 
   test("shows error on invalid credentials", async ({ page }) => {

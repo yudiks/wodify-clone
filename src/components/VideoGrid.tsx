@@ -211,7 +211,9 @@ export default function VideoGrid({
                           {initials(s.athlete.name)}
                         </span>
                       )}
-                      {showAthlete ? s.athlete.name : `${s._count.annotations} annotations`}
+                      {showAthlete
+                        ? s.athlete.name
+                        : `${s._count.annotations} annotation${s._count.annotations === 1 ? "" : "s"} · ${s._count.comments} comment${s._count.comments === 1 ? "" : "s"}`}
                     </span>
                     <span style={{ fontSize: 11 }}>{new Date(s.createdAt).toLocaleDateString()}</span>
                   </div>
