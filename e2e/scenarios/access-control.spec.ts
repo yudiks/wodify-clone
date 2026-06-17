@@ -51,8 +51,15 @@ test.describe("Role-based access control", () => {
   test("athlete cannot POST an annotation on another athlete's submission (API-level enforcement)", async ({
     page,
   }) => {
-    // Athlete A creates a submission.
-    await loginAs(page, ATHLETE);
+    // Two throwaway athletes, kept separate from the shared seeded ATHLETE
+    // account so this test doesn't leave a submission behind for other
+    // specs that assume a clean dashboard.
+    const emailA = `athlete-a-${Date.now()}@example.com`;
+    await page.request.post("/api/register", {
+      data: { name: "Athlete A", email: emailA, password: "password123", role: "ATHLETE" },
+    });
+    await loginAs(page, { email: emailA, password: "password123" });
+
     const submissionId = await page.evaluate(async () => {
       const res = await fetch("/api/submissions", {
         method: "POST",
@@ -67,11 +74,11 @@ test.describe("Role-based access control", () => {
     });
 
     // Athlete B registers and tries to annotate athlete A's submission.
-    const email = `athlete-b-${Date.now()}@example.com`;
+    const emailB = `athlete-b-${Date.now()}@example.com`;
     await page.request.post("/api/register", {
-      data: { name: "Athlete B", email, password: "password123", role: "ATHLETE" },
+      data: { name: "Athlete B", email: emailB, password: "password123", role: "ATHLETE" },
     });
-    await loginAs(page, { email, password: "password123" });
+    await loginAs(page, { email: emailB, password: "password123" });
 
     const status = await page.evaluate(
       async (submissionId) => {
