@@ -145,7 +145,7 @@ export default async function Home() {
         ].map(({ n, title, body }) => (
           <div key={n} className="flex flex-col gap-2 rounded-xl border border-zinc-100 bg-zinc-50 p-5">
             <span className="text-2xl font-bold text-indigo-600">{n}</span>
-            <p className="font-semibold">{title}</p>
+            <p className="font-semibold text-zinc-900">{title}</p>
             <p className="text-sm text-zinc-500">{body}</p>
           </div>
         ))}
