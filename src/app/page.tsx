@@ -52,16 +52,16 @@ export default async function Home() {
           <div className="relative w-full bg-zinc-700" style={{ aspectRatio: "16/9" }}>
             {/* Simulated video still — dark background with athlete silhouette feel */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <svg viewBox="0 0 640 360" className="h-full w-full opacity-20" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 640 360" className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
                 {/* Barbell */}
-                <rect x="120" y="172" width="400" height="16" rx="8" fill="white"/>
-                <rect x="100" y="148" width="40" height="64" rx="6" fill="white"/>
-                <rect x="500" y="148" width="40" height="64" rx="6" fill="white"/>
+                <rect x="120" y="172" width="400" height="16" rx="8" fill="rgba(255,255,255,0.35)"/>
+                <rect x="100" y="148" width="40" height="64" rx="6" fill="rgba(255,255,255,0.35)"/>
+                <rect x="500" y="148" width="40" height="64" rx="6" fill="rgba(255,255,255,0.35)"/>
                 {/* Athlete silhouette (squat) */}
-                <ellipse cx="320" cy="108" rx="28" ry="28" fill="white"/>
-                <path d="M320 136 L310 172 L290 230 L310 230 L320 195 L330 230 L350 230 L330 172 Z" fill="white"/>
-                <path d="M310 172 L270 185 L265 210 L285 210 L290 190 Z" fill="white"/>
-                <path d="M330 172 L370 185 L375 210 L355 210 L350 190 Z" fill="white"/>
+                <ellipse cx="320" cy="108" rx="28" ry="28" fill="rgba(255,255,255,0.35)"/>
+                <path d="M320 136 L310 172 L290 230 L310 230 L320 195 L330 230 L350 230 L330 172 Z" fill="rgba(255,255,255,0.35)"/>
+                <path d="M310 172 L270 185 L265 210 L285 210 L290 190 Z" fill="rgba(255,255,255,0.35)"/>
+                <path d="M330 172 L370 185 L375 210 L355 210 L350 190 Z" fill="rgba(255,255,255,0.35)"/>
               </svg>
             </div>
 
