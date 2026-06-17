@@ -18,15 +18,34 @@ async function trimVideo(
   start: number,
   end: number,
   onProgress: (p: number) => void,
-): Promise<File> {
+): Promise<{ file: File; trimmed: boolean }> {
   return new Promise((resolve) => {
     const video = document.createElement("video");
     video.muted = true;
+    video.playsInline = true;
+    // captureStream only reliably produces frames once the element is part
+    // of the document — a detached <video> silently records a blank/frozen
+    // stream in several browsers, which looked like "trimming did nothing".
+    video.style.position = "fixed";
+    video.style.top = "-9999px";
+    video.style.width = "1px";
+    video.style.height = "1px";
+    document.body.appendChild(video);
+
     const src = URL.createObjectURL(file);
     video.src = src;
 
+    function cleanup() {
+      URL.revokeObjectURL(src);
+      video.remove();
+    }
+
+    function fallback() {
+      cleanup();
+      resolve({ file, trimmed: false });
+    }
+
     video.onloadedmetadata = () => {
-      // Detect browser support
       const cap =
         (video as HTMLVideoElement & { captureStream?: () => MediaStream; mozCaptureStream?: () => MediaStream })
           .captureStream ??
@@ -40,54 +59,71 @@ async function trimVideo(
         : "";
 
       if (!cap || !mimeType) {
-        URL.revokeObjectURL(src);
-        resolve(file);
+        fallback();
         return;
       }
 
       const stream = cap.call(video);
       const recorder = new MediaRecorder(stream, { mimeType });
       const chunks: BlobPart[] = [];
+      let stopped = false;
 
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunks.push(e.data);
       };
 
       recorder.onstop = () => {
-        URL.revokeObjectURL(src);
+        cleanup();
         const blob = new Blob(chunks, { type: "video/webm" });
-        const trimmed = new File(
+        const trimmedFile = new File(
           [blob],
           file.name.replace(/\.[^.]+$/, ".webm"),
           { type: "video/webm" },
         );
         onProgress(1);
-        resolve(trimmed);
+        resolve({ file: trimmedFile, trimmed: true });
       };
+
+      function stopRecording() {
+        if (stopped) return;
+        stopped = true;
+        video.removeEventListener("timeupdate", onTimeUpdate);
+        clearTimeout(safetyTimer);
+        recorder.stop();
+        video.pause();
+      }
+
+      function onTimeUpdate() {
+        const duration = end - start;
+        const elapsed = video.currentTime - start;
+        onProgress(Math.min(Math.max(elapsed / duration, 0), 0.95));
+        if (video.currentTime >= end) stopRecording();
+      }
+
+      // Backstop in case timeupdate doesn't fire enough (e.g. throttled
+      // background tab) so the recording always terminates.
+      const safetyTimer = setTimeout(stopRecording, (end - start) * 1000 + 1500);
 
       video.currentTime = start;
       video.onseeked = () => {
-        const duration = end - start;
-        let elapsed = 0;
-        const tick = setInterval(() => {
-          elapsed += 0.2;
-          onProgress(Math.min(elapsed / duration, 0.95));
-        }, 200);
-
-        recorder.start(200);
-        video.play();
-
-        setTimeout(() => {
-          clearInterval(tick);
-          recorder.stop();
-          video.pause();
-        }, duration * 1000 + 300);
+        video.onseeked = null;
+        video
+          .play()
+          .then(() => {
+            video.addEventListener("timeupdate", onTimeUpdate);
+            recorder.start(200);
+          })
+          .catch(() => {
+            stopped = true;
+            clearTimeout(safetyTimer);
+            fallback();
+          });
       };
 
-      video.onerror = () => { URL.revokeObjectURL(src); resolve(file); };
+      video.onerror = fallback;
     };
 
-    video.onerror = () => resolve(file);
+    video.onerror = fallback;
   });
 }
 
@@ -153,8 +189,14 @@ export default function UploadForm() {
         if (isTrimmed && videoDuration > 0) {
           setProgress("Trimming video… (plays in real-time)");
           setTrimProgress(0);
-          file = await trimVideo(file, trimStart, trimEnd, (p) => setTrimProgress(p));
+          const result = await trimVideo(file, trimStart, trimEnd, (p) => setTrimProgress(p));
           setTrimProgress(null);
+          file = result.file;
+          if (!result.trimmed) {
+            setError(
+              "Your browser doesn't support trimming videos, so the full video was uploaded instead.",
+            );
+          }
         }
 
         setProgress("Uploading video…");
