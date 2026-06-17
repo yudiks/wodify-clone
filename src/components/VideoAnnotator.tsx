@@ -98,7 +98,7 @@ function YouTubePlayerSection({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="relative w-full overflow-hidden rounded bg-black" style={{ aspectRatio: "16/9" }}>
+      <div className="relative w-full overflow-hidden rounded bg-slate-900" style={{ aspectRatio: "16/9" }}>
         <iframe
           ref={iframeRef}
           src={embedSrc}
@@ -410,7 +410,7 @@ export default function VideoAnnotator({
 
   return (
     <div className="flex flex-col gap-3">
-      <div ref={containerRef} className="relative w-full overflow-hidden rounded bg-black">
+      <div ref={containerRef} className="relative w-full overflow-hidden rounded bg-slate-900">
         <video
           ref={videoRef}
           src={videoUrl}
