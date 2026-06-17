@@ -102,8 +102,8 @@ test("full athlete → coach → athlete workflow", async ({ page }) => {
   // Coach comment is visible
   await expect(page.getByText("Overall a solid lift — two things to work on above.")).toBeVisible();
 
-  // Athlete cannot see annotation controls
-  await expect(page.getByText("Add annotation at current frame")).not.toBeVisible();
+  // Athletes can annotate their own submission (canAnnotate = isCoach || isOwner)
+  await expect(page.getByText("Add annotation at current frame")).toBeVisible();
 
   // ── Step 4: Athlete posts a follow-up comment ─────────────────────────────
   await page.fill('textarea[placeholder*="comment"]', "Thanks coach! I'll focus on elbow speed in my next session.");

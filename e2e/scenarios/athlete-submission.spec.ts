@@ -40,10 +40,10 @@ test.describe("Athlete submission flow", () => {
       page.getByRole("heading", { name: "Front Squat Detail Test" })
     ).toBeVisible();
     await expect(page.locator("video")).toBeVisible();
-    // Athletes should not see annotation controls
+    // Athletes can annotate their own submission (canAnnotate = isCoach || isOwner)
     await expect(
       page.getByText("Add annotation at current frame")
-    ).not.toBeVisible();
+    ).toBeVisible();
   });
 
   test("athlete can post a comment on their own submission", async ({
