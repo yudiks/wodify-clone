@@ -260,7 +260,7 @@ export default function UploadForm() {
                 src={videoObjectUrl}
                 controls
                 onLoadedMetadata={handleMetadataLoaded}
-                className="max-h-48 w-full rounded bg-slate-900 object-contain"
+                className="max-h-48 w-full rounded bg-zinc-700 object-contain"
               />
 
               {videoDuration > 0 && (

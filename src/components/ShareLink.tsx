@@ -54,9 +54,12 @@ export default function ShareLink({ submissionId }: { submissionId: string }) {
           }
           setOpen(!open);
         }}
-        className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+        title="Share submission"
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
       >
-        Share
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+          <path d="M13 4.5a2.5 2.5 0 11.702 1.737L6.97 9.604a2.518 2.518 0 010 .792l6.733 3.367a2.5 2.5 0 11-.671 1.341l-6.733-3.367a2.5 2.5 0 110-3.475l6.733-3.366A2.52 2.52 0 0113 4.5z" />
+        </svg>
       </button>
 
       {open && (
@@ -69,7 +72,7 @@ export default function ShareLink({ submissionId }: { submissionId: string }) {
               <button
                 onClick={generateShareLink}
                 disabled={loading}
-                className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-zinc-300"
+                className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:bg-zinc-300"
               >
                 {loading ? "Generating..." : "Generate Share Link"}
               </button>
@@ -87,7 +90,7 @@ export default function ShareLink({ submissionId }: { submissionId: string }) {
                   />
                   <button
                     onClick={copyToClipboard}
-                    className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700"
+                    className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white hover:bg-indigo-700"
                   >
                     {copied ? "Copied!" : "Copy"}
                   </button>
