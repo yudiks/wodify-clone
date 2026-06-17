@@ -24,7 +24,12 @@ services:
       DATABASE_URL: postgresql://wodify:wodify@db:5432/wodify?schema=public
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-change-me-in-production}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
-      BLOB_READ_WRITE_TOKEN: ${BLOB_READ_WRITE_TOKEN:-}
+      # Falls back to a placeholder so @vercel/blob can generate a client
+      # token locally/in e2e tests without a real Vercel Blob store — the
+      # actual upload PUT to vercel.com is mocked in e2e/fixtures/auth.ts,
+      # so this token's value never needs to be valid against real Vercel
+      # infra. Set a real token here (or in a .env file) for actual uploads.
+      BLOB_READ_WRITE_TOKEN: ${BLOB_READ_WRITE_TOKEN:-vercel_blob_rw_localdev_0000000000000000000000000000000000000000000000000000000000000000}
     ports:
       - "3000:3000"
     volumes:
