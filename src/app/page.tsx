@@ -94,7 +94,7 @@ export default async function Home() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold">Coach Sarah</span>
+                  <span className="text-sm font-semibold text-zinc-900">Coach Sarah</span>
                   <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600">Coach</span>
                   <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-500">0:12</span>
                 </div>
@@ -111,7 +111,7 @@ export default async function Home() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold">Coach Sarah</span>
+                  <span className="text-sm font-semibold text-zinc-900">Coach Sarah</span>
                   <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600">Coach</span>
                   <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-500">0:24</span>
                 </div>

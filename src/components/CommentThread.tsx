@@ -67,24 +67,46 @@ export default function CommentThread({
       {comments.length === 0 ? (
         <p className="text-sm text-zinc-500 dark:text-zinc-400">No comments yet.</p>
       ) : (
-        <ul className="flex flex-col gap-2">
-          {comments.map((c) => (
-            <li key={c.id} className="rounded border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-              <div className="mb-1 flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                <span className="font-medium text-zinc-700 dark:text-zinc-300">{c.author.name}</span>
-                <span>· {c.author.role}</span>
-                {c.timestampSec != null && (
-                  <button
-                    onClick={() => seekTo(c.timestampSec!)}
-                    className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono hover:bg-zinc-200 dark:bg-zinc-700 dark:hover:bg-zinc-600"
-                  >
-                    {formatTime(c.timestampSec)}
-                  </button>
-                )}
-              </div>
-              <p>{c.text}</p>
-            </li>
-          ))}
+        <ul className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+          {comments.map((c) => {
+            const isCoach = c.author.role === "COACH";
+            return (
+              <li key={c.id} className="flex items-start gap-3">
+                <div
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                    isCoach
+                      ? "bg-indigo-100 text-indigo-700"
+                      : "bg-emerald-100 text-emerald-700"
+                  }`}
+                >
+                  {initials(c.author.name)}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{c.author.name}</span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                        isCoach
+                          ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300"
+                          : "bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300"
+                      }`}
+                    >
+                      {isCoach ? "Coach" : "Athlete"}
+                    </span>
+                    {c.timestampSec != null && (
+                      <button
+                        onClick={() => seekTo(c.timestampSec!)}
+                        className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                      >
+                        {formatTime(c.timestampSec)}
+                      </button>
+                    )}
+                  </div>
+                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{c.text}</p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
       <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-2">
@@ -114,6 +136,15 @@ export default function CommentThread({
       </form>
     </div>
   );
+}
+
+function initials(name: string): string {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
 }
 
 function formatTime(seconds: number): string {

@@ -21,6 +21,15 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function initials(name: string): string {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
 // ---- YouTube branch ----
 
 function YouTubePlayerSection({
@@ -127,11 +136,22 @@ function YouTubePlayerSection({
       )}
 
       {activeAnnotation && (
-        <div className="rounded border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="font-medium">
-            {activeAnnotation.coach.name} at {formatTime(activeAnnotation.timestampSec)}
-          </p>
-          <p className="text-zinc-700 dark:text-zinc-300">{activeAnnotation.note}</p>
+        <div className="flex items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+            {initials(activeAnnotation.coach.name)}
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{activeAnnotation.coach.name}</span>
+              <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300">
+                Coach
+              </span>
+              <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                {formatTime(activeAnnotation.timestampSec)}
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{activeAnnotation.note}</p>
+          </div>
         </div>
       )}
 
@@ -471,11 +491,22 @@ export default function VideoAnnotator({
       )}
 
       {activeAnnotation && (
-        <div className="rounded border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="font-medium">
-            {activeAnnotation.coach.name} at {formatTime(activeAnnotation.timestampSec)}
-          </p>
-          <p className="text-zinc-700 dark:text-zinc-300">{activeAnnotation.note}</p>
+        <div className="flex items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+            {initials(activeAnnotation.coach.name)}
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{activeAnnotation.coach.name}</span>
+              <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300">
+                Coach
+              </span>
+              <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                {formatTime(activeAnnotation.timestampSec)}
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{activeAnnotation.note}</p>
+          </div>
         </div>
       )}
 
