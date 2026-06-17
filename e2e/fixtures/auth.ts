@@ -76,7 +76,10 @@ export async function uploadVideo(page: Page, title: string): Promise<string> {
   await page.goto("/upload");
   await page.fill('input[name="title"]', title);
   await page.setInputFiles('input[type="file"]', SAMPLE_VIDEO);
-  await page.click('button:has-text("Upload")');
+  // Not `button:has-text("Upload")` — the file/YouTube mode toggle button
+  // is labeled "Upload file" and appears earlier in the DOM, so a substring
+  // match clicks that no-op toggle instead of the real submit button.
+  await page.click('button[type="submit"]');
   await page.waitForURL(/\/dashboard/);
   await expect(page.getByText(title)).toBeVisible({ timeout: 20000 });
   const href = await page.locator(`a:has-text("${title}")`).getAttribute("href");
