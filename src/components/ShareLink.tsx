@@ -7,7 +7,9 @@ export default function ShareLink({ submissionId }: { submissionId: string }) {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
+  const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties>({});
   const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -15,11 +17,26 @@ export default function ShareLink({ submissionId }: { submissionId: string }) {
         setOpen(false);
       }
     }
-
     if (open) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
+  }, [open]);
+
+  // Position the popover so it never clips off the left edge
+  useEffect(() => {
+    if (!open || !btnRef.current) return;
+    const rect = btnRef.current.getBoundingClientRect();
+    const popoverWidth = Math.min(320, window.innerWidth - 16);
+    // Align right edge of popover with right edge of button; clamp left to 8px
+    const rightAligned = rect.right - popoverWidth;
+    const left = Math.max(8, rightAligned);
+    setPopoverStyle({
+      position: "fixed",
+      top: rect.bottom + 8,
+      left,
+      width: popoverWidth,
+    });
   }, [open]);
 
   const generateShareLink = async () => {
@@ -46,12 +63,11 @@ export default function ShareLink({ submissionId }: { submissionId: string }) {
   };
 
   return (
-    <div className="relative" ref={ref}>
+    <div ref={ref}>
       <button
+        ref={btnRef}
         onClick={() => {
-          if (!shareToken) {
-            generateShareLink();
-          }
+          if (!shareToken) generateShareLink();
           setOpen(!open);
         }}
         title="Share submission"
@@ -63,7 +79,10 @@ export default function ShareLink({ submissionId }: { submissionId: string }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 rounded-lg border border-zinc-200 bg-white p-4 shadow-lg z-50">
+        <div
+          className="z-50 rounded-lg border border-zinc-200 bg-white p-4 shadow-lg"
+          style={popoverStyle}
+        >
           {!shareToken ? (
             <div className="text-center">
               <p className="mb-3 text-sm text-zinc-600">
@@ -86,11 +105,11 @@ export default function ShareLink({ submissionId }: { submissionId: string }) {
                     type="text"
                     value={`${window.location.origin}/share/${shareToken}`}
                     readOnly
-                    className="flex-1 rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-2 text-xs font-mono text-zinc-600"
+                    className="flex-1 min-w-0 rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-2 text-xs font-mono text-zinc-600"
                   />
                   <button
                     onClick={copyToClipboard}
-                    className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white hover:bg-indigo-700"
+                    className="shrink-0 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white hover:bg-indigo-700"
                   >
                     {copied ? "Copied!" : "Copy"}
                   </button>
