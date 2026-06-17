@@ -18,7 +18,7 @@ export default async function CoachPage() {
   });
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-8">
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-6 sm:py-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-outfit)" }}>Dashboard</h1>

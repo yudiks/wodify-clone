@@ -39,16 +39,22 @@ export default function SubmissionReview({
   const videoRef = useRef<HTMLVideoElement>(null);
 
   return (
-    <div className="flex flex-col gap-6">
-      <VideoAnnotator
-        submissionId={submissionId}
-        videoUrl={videoUrl}
-        annotations={annotations}
-        isCoach={isCoach}
-        canAnnotate={canAnnotate}
-        videoRef={videoRef}
-      />
-      <CommentThread submissionId={submissionId} comments={comments} videoRef={videoRef} />
+    <div className="flex flex-col gap-8">
+      <section className="flex flex-col gap-3">
+        <h2 className="section-title">Video &amp; Feedback</h2>
+        <VideoAnnotator
+          submissionId={submissionId}
+          videoUrl={videoUrl}
+          annotations={annotations}
+          isCoach={isCoach}
+          canAnnotate={canAnnotate}
+          videoRef={videoRef}
+        />
+      </section>
+      <section className="flex flex-col gap-3">
+        <h2 className="section-title">Comments</h2>
+        <CommentThread submissionId={submissionId} comments={comments} videoRef={videoRef} />
+      </section>
     </div>
   );
 }

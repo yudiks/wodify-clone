@@ -63,7 +63,6 @@ export default function CommentThread({
 
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="font-semibold" style={{ fontFamily: "var(--font-outfit)" }}>Comments</h2>
       {comments.length === 0 ? (
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>No comments yet.</p>
       ) : (
