@@ -5,6 +5,7 @@ import SubmissionReview from "@/components/SubmissionReview";
 import DeleteSubmissionButton from "@/components/DeleteSubmissionButton";
 import EditableTitle from "@/components/EditableTitle";
 import CompleteReviewButton from "@/components/CompleteReviewButton";
+import ShareLink from "@/components/ShareLink";
 
 export default async function SubmissionPage({
   params,
@@ -60,6 +61,7 @@ export default async function SubmissionPage({
               status={submission.status as "PENDING" | "REVIEWED"}
             />
           )}
+          <ShareLink submissionId={submission.id} />
           {isOwner && <DeleteSubmissionButton submissionId={submission.id} />}
         </div>
       </div>
