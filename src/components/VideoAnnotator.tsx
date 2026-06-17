@@ -66,6 +66,24 @@ function YouTubePlayerSection({
     }
   }, []);
 
+  // Poll playback position while YouTube video is playing to auto-show annotations.
+  useEffect(() => {
+    if (!ytReady) return;
+    const id = setInterval(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const state: number = (playerRef.current as any)?.getPlayerState?.() ?? -1;
+      if (state !== 1) return; // 1 = playing
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const t: number = (playerRef.current as any)?.getCurrentTime?.() ?? 0;
+      const candidates = annotations.filter(
+        (a) => t >= a.timestampSec && t <= a.timestampSec + 3,
+      );
+      const match = candidates[candidates.length - 1] ?? null;
+      setActiveAnnotation((prev) => (prev?.id === match?.id ? prev : match));
+    }, 250);
+    return () => clearInterval(id);
+  }, [ytReady, annotations]);
+
   const embedSrc = videoUrl.includes("enablejsapi")
     ? videoUrl
     : `${videoUrl}?enablejsapi=1`;
@@ -400,17 +418,24 @@ export default function VideoAnnotator({
           playsInline
           className="max-h-72 w-full object-contain"
           onPlay={() => {
-            if (activeAnnotation) {
-              setActiveAnnotation(null);
-              clearCanvas();
-            }
+            if (drawing) return;
+            clearCanvas();
+          }}
+          onTimeUpdate={() => {
+            if (drawing) return;
+            const t = videoRef.current?.currentTime ?? 0;
+            const candidates = annotations.filter(
+              (a) => t >= a.timestampSec && t <= a.timestampSec + 3,
+            );
+            const match = candidates[candidates.length - 1] ?? null;
+            setActiveAnnotation((prev) => (prev?.id === match?.id ? prev : match));
           }}
         />
-        {activeAnnotation && (
+        {activeAnnotation && activeAnnotation.drawingDataUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={activeAnnotation.drawingDataUrl}
-            alt="Coach annotation"
+            alt="Annotation drawing"
             className="pointer-events-none absolute left-0 top-0 h-full w-full"
           />
         )}
