@@ -20,7 +20,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-8">
-      <h1 className="text-2xl font-bold">My Submissions</h1>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">My Submissions</h1>
+        <p className="text-sm text-zinc-500">Upload videos and track coach feedback.</p>
+      </div>
       <UploadForm />
       <SubmissionList submissions={submissions} />
     </div>

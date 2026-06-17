@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import SubmissionReview from "@/components/SubmissionReview";
 import DeleteSubmissionButton from "@/components/DeleteSubmissionButton";
+import EditableTitle from "@/components/EditableTitle";
 
 export default async function SubmissionPage({
   params,
@@ -42,8 +43,12 @@ export default async function SubmissionPage({
     <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-8">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{submission.title}</h1>
-          <p className="text-sm text-zinc-500">
+          <EditableTitle
+            submissionId={submission.id}
+            title={submission.title}
+            canEdit={isOwner}
+          />
+          <p className="mt-0.5 text-sm text-zinc-500">
             {submission.athlete.name} · {new Date(submission.createdAt).toLocaleString()}
           </p>
         </div>
