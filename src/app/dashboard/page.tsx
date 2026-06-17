@@ -2,7 +2,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import UploadForm from "@/components/UploadForm";
-import SubmissionList from "@/components/SubmissionList";
+import VideoGrid from "@/components/VideoGrid";
+import RoleSwitcher from "@/components/RoleSwitcher";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -19,15 +20,18 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-outfit)" }}>
-          My Submissions
-        </h1>
-        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Upload videos and track coach feedback.</p>
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-8">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-outfit)" }}>
+            Dashboard
+          </h1>
+          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Upload videos and track coach feedback.</p>
+        </div>
+        <RoleSwitcher role="ATHLETE" />
       </div>
       <UploadForm />
-      <SubmissionList submissions={submissions} />
+      <VideoGrid submissions={submissions} role="ATHLETE" />
     </div>
   );
 }
