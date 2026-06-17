@@ -21,13 +21,30 @@ export default function AuthedNav({
     setOpen(false);
   }, [pathname]);
 
+  const DashboardIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+    </svg>
+  );
+
+  const UploadIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <path d="M17 8l-5-5-5 5" />
+      <path d="M12 3v12" />
+    </svg>
+  );
+
   const links =
     role === "ATHLETE"
       ? [
-          { href: "/dashboard", label: "Dashboard" },
-          { href: "/upload", label: "Upload" },
+          { href: "/dashboard", label: "Dashboard", icon: DashboardIcon },
+          { href: "/upload", label: "Upload", icon: UploadIcon },
         ]
-      : [{ href: "/coach", label: "Coach Inbox" }];
+      : [{ href: "/coach", label: "Coach Inbox", icon: DashboardIcon }];
 
   const sidebarContent = (
     <>
@@ -52,9 +69,10 @@ export default function AuthedNav({
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/5"
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/5"
               style={active ? { background: "rgba(41,121,255,0.12)", color: "var(--accent-blue)" } : { color: "var(--text-secondary)" }}
             >
+              {link.icon}
               {link.label}
             </Link>
           );
