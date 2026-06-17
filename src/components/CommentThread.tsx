@@ -107,7 +107,7 @@ export default function CommentThread({
         <button
           type="submit"
           disabled={submitting || !text.trim()}
-          className="self-start rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          className="self-start rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
         >
           {submitting ? "Posting..." : "Post comment"}
         </button>

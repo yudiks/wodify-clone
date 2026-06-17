@@ -43,11 +43,29 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const submission = await prisma.submission.findUnique({ where: { id } });
   if (!submission) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  const body = await req.json();
+
+  // Coach: update status
+  if ("status" in body) {
+    if (session.user.role !== "COACH") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (body.status !== "REVIEWED" && body.status !== "PENDING") {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
+    const updated = await prisma.submission.update({
+      where: { id },
+      data: { status: body.status },
+    });
+    return NextResponse.json(updated);
+  }
+
+  // Athlete: update title (must be owner)
   if (submission.athleteId !== session.user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { title } = await req.json();
+  const { title } = body;
   if (typeof title !== "string" || !title.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
   }

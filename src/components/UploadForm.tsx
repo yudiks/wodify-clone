@@ -219,7 +219,7 @@ export default function UploadForm() {
           onClick={() => setMode("file")}
           className={`flex-1 rounded px-3 py-1.5 transition-colors ${
             mode === "file"
-              ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+              ? "bg-indigo-600 text-white"
               : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
           }`}
         >
@@ -230,7 +230,7 @@ export default function UploadForm() {
           onClick={() => setMode("youtube")}
           className={`flex-1 rounded px-3 py-1.5 transition-colors ${
             mode === "youtube"
-              ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+              ? "bg-indigo-600 text-white"
               : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
           }`}
         >
@@ -349,7 +349,7 @@ export default function UploadForm() {
       <button
         type="submit"
         disabled={loading || (mode === "youtube" && !youtubeValid)}
-        className="w-full rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300 sm:w-auto"
+        className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50 sm:w-auto"
       >
         {loading ? (progress ?? "Saving…") : mode === "youtube" ? "Add video" : "Upload"}
       </button>

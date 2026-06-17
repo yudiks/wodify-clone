@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import SubmissionReview from "@/components/SubmissionReview";
 import DeleteSubmissionButton from "@/components/DeleteSubmissionButton";
 import EditableTitle from "@/components/EditableTitle";
+import CompleteReviewButton from "@/components/CompleteReviewButton";
 
 export default async function SubmissionPage({
   params,
@@ -41,8 +42,8 @@ export default async function SubmissionPage({
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-8">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <EditableTitle
             submissionId={submission.id}
             title={submission.title}
@@ -52,7 +53,15 @@ export default async function SubmissionPage({
             {submission.athlete.name} · {new Date(submission.createdAt).toLocaleString()}
           </p>
         </div>
-        {isOwner && <DeleteSubmissionButton submissionId={submission.id} />}
+        <div className="flex shrink-0 items-center gap-2">
+          {isCoach && (
+            <CompleteReviewButton
+              submissionId={submission.id}
+              status={submission.status as "PENDING" | "REVIEWED"}
+            />
+          )}
+          {isOwner && <DeleteSubmissionButton submissionId={submission.id} />}
+        </div>
       </div>
       <SubmissionReview
         submissionId={submission.id}

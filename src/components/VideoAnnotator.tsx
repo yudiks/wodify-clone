@@ -116,7 +116,7 @@ function YouTubePlayerSection({
               onClick={() => handleAnnotationClick(a)}
               className={`rounded border px-2 py-1 text-xs ${
                 activeAnnotation?.id === a.id
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                  ? "border-indigo-600 bg-indigo-600 text-white"
                   : "border-zinc-300 hover:border-zinc-500 dark:border-zinc-700 dark:hover:border-zinc-400"
               }`}
             >
@@ -197,7 +197,7 @@ function YouTubeAnnotationForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700"
+        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
       >
         Add annotation
       </button>
@@ -233,7 +233,7 @@ function YouTubeAnnotationForm({
         <button
           onClick={save}
           disabled={saving || !note.trim() || capturedTime === null}
-          className="rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
+          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save annotation"}
         </button>
@@ -460,7 +460,7 @@ export default function VideoAnnotator({
               onClick={() => viewAnnotation(a)}
               className={`rounded border px-2 py-1 text-xs ${
                 activeAnnotation?.id === a.id
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                  ? "border-indigo-600 bg-indigo-600 text-white"
                   : "border-zinc-300 hover:border-zinc-500 dark:border-zinc-700 dark:hover:border-zinc-400"
               }`}
             >
@@ -484,7 +484,7 @@ export default function VideoAnnotator({
           {!drawing ? (
             <button
               onClick={startNewAnnotation}
-              className="w-full rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 sm:w-auto"
+              className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 sm:w-auto"
             >
               Add annotation at current frame
             </button>
@@ -525,7 +525,7 @@ export default function VideoAnnotator({
                 <button
                   onClick={saveAnnotation}
                   disabled={saving || !note.trim()}
-                  className="rounded bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700 disabled:opacity-50"
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
                 >
                   {saving ? "Saving…" : "Save annotation"}
                 </button>
